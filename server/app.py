@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #do our startup routine here
     #Load config into memory and print version
     basepath = os.path.dirname(os.path.abspath(__file__))
-    with open(basepath + "\\" + 'config.json') as config:
+    with open(basepath + "/" + 'config.json') as config:
         j = json.loads(config.read())
         print(" * Version " + j['version'])
     
