@@ -1,10 +1,12 @@
 from flask import Flask, jsonify
 from utils import SQL, Config
+from flask.ext.cors import CORS
 import os
 import json
 
 config = Config()
 app = Flask(__name__)
+CORS(app)
 sql = SQL(config)
 
 @app.route("/")
