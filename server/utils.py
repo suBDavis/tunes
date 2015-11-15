@@ -38,20 +38,20 @@ class SQL:
         sql = "SELECT songid, plid, artist, title, album FROM sp_relation R JOIN sp_songs S ON S.guid = R.songid WHERE plid = %s"
         params = (plid,)
         result = self.query(sql, params)
-        if (isinstance(result, dict)):
-            return result
-        else:
-            return {"tracks" : result}
+        return self.checkReturn(result, "tracks")
 
     def allCounts(self):
         sql = "SELECT Songs, relations, users, maxid, plcount, (relations - Songs) AS diff FROM  (  SELECT COUNT(*) AS Songs, relations, users, maxid, plcount FROM sp_songs  JOIN (SELECT COUNT(*) AS relations FROM sp_relation) AS rel  JOIN (SELECT COUNT(*) AS users FROM sp_users) AS usr  JOIN (SELECT MAX(id) AS maxid FROM sp_users) AS m  JOIN (SELECT COUNT(*) AS plcount FROM sp_playlists) AS pl  ) AS counts"
         params = ()
         result = self.query(sql, params)
-        if (isinstance(result, dict)):
-            return result
-        else:
-            return {"counts" : result}
-            
+        return self.checkReturn(result, "counts")
+
+    def topArtists(self, artist):
+        sql = "SELECT artist, COUNT(*) C FROM sp_songs WHERE artist LIKE %s GROUP BY artist ORDER BY C DESC LIMIT 10"
+        params = (artist + "%",)
+        result = self.query(sql, params)
+        return self.checkReturn(result, "artists")
+    #This runs the query against the server.        
     def query(self, query, params):
         try:
             with self.connection.cursor() as c:
@@ -60,6 +60,12 @@ class SQL:
                 return res
         except:
             return self.error()
-
+    #This creates a new error message
     def error(self):
-        return { "error" : "internal" }
+        return { "error" : "internal"}
+    #this packs the message to go back to the user
+    def checkReturn(self, result, setname):
+        if (isinstance(result, dict)):
+            return result
+        else:
+            return { setname : result }

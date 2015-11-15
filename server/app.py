@@ -18,11 +18,15 @@ def mysql():
 
 @app.route("/playlist/<plid>/tracks")
 def tracksByPlaylist(plid):
-    return(jsonify(sql.tracksByPlaylist(plid)))
+    return jsonify(sql.tracksByPlaylist(plid))
 
 @app.route("/mysql/counts")
 def mysqlCounts():
-    return(jsonify(sql.allCounts()))
+    return jsonify(sql.allCounts())
+
+@app.route("/artists/<name>")
+def topArtists(name):
+    return jsonify(sql.topArtists(name))
 
 if __name__ == "__main__":
     #do our startup routine here
