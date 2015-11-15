@@ -7,7 +7,7 @@ function test(){
 
 function testAjax(){
     $.ajax({
-        url: baseurl + "/mysql/counts",
+        url: "mysql/counts",
         context: document.body
     });
 }
