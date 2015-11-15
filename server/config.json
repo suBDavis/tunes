@@ -1,9 +1,10 @@
 {
     "version":"0.1",
     "sql" : {
-        "host" : "localhost",
+        "host" : "tunes.redspin.net",
         "port" : "3306",
-        "user" : "root",
-        "pass" : "kmpizbest"
+        "user" : "tunes",
+        "pass" : "dootdoot",
+        "db" : "tunes"
     }
 }

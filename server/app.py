@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from utils import SQL, Config
 import os
 import json
@@ -11,7 +11,19 @@ sql = SQL(config)
 def hello():
     return "Hello World"
 
+@app.route("/mysql")
+def mysql():
+    #print the connection stats for mysql
+    return jsonify(sql.getConnectionData())
+
+@app.route("/playlist/<plid>/tracks")
+def tracksByPlaylist(plid):
+    return(jsonify(sql.tracksByPlaylist(plid)))
+
+@app.route("/mysql/counts")
+def mysqlCounts():
+    return(jsonify(sql.allCounts()))
 
 if __name__ == "__main__":
     #do our startup routine here
-    app.run()
+    app.run(debug=True)
