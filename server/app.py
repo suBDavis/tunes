@@ -9,11 +9,10 @@ sql = SQL(config)
 
 @app.route("/")
 def hello():
-    return "Hello World"
+    return "Spotitunes API Version " + config.getVersion()
 
 @app.route("/mysql")
 def mysql():
-    #print the connection stats for mysql
     return jsonify(sql.getConnectionData())
 
 @app.route("/playlist/<plid>/tracks")

@@ -18,6 +18,9 @@ class Config:
     def getSQLCreds(self):
         return self.config['sql']
 
+    def getVersion(self):
+        return self.config['version']
+
 class SQL:
 
     def __init__(self, config):

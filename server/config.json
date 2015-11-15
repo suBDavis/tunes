@@ -6,5 +6,11 @@
         "user" : "tunes",
         "pass" : "dootdoot",
         "db" : "tunes"
+    },
+    "spotify" : {
+        "client_id" : "356178f8dbbb42b78a9805ed11b6cb32",
+        "client_secret" : "37a075265339487c891163a5aef0ea3b",
+        "redirect_uri" : "http://localhost:8888/callback",
+        "username" : "subdaivs"
     }
 }
