@@ -8,9 +8,9 @@ class Config:
         #Load config into memory and print version
         fdiv = "/"
         if os.name == "nt":
-            # change based on OS
+            # change based on OS - Windows is "nt"? WTF
             fdiv = "\\"
-        basepath = os.path.dirname(os.path.abspath(__file__)) #this works on any OS
+        basepath = os.path.dirname(os.path.abspath(__file__)) #this works on any OS now
         with open(basepath + fdiv + 'config.json') as config_file:
             self.config = json.loads(config_file.read())
             print(" * Version " + self.config['version'])
@@ -21,7 +21,7 @@ class Config:
 class SQL:
 
     def __init__(self, config):
-        # just comment out the #bind-address line in /etc/mysql/my.cnf
+        # just comment out the #bind-address line in /etc/mysql/my.cnf for global access
         self.creds = config.getSQLCreds()
         print(" * Loading SQL on user " + self.creds['host'] + ":" + self.creds['port'])
         self.connection = pymysql.connect(host = self.creds['host'],
