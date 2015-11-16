@@ -54,13 +54,20 @@ class SQL:
         params = (artist + "%",)
         result = self.query(sql, params)
         return self.checkReturn(result, "artists")
+
+    def search(self, searchterm):
+        sql = "(SELECT 'song' AS t, title AS result, artist as result2, COUNT(*) C FROM sp_songs WHERE title LIKE %s GROUP BY title ORDER BY C DESC LIMIT 10) UNION (SELECT 'artist' AS t, artist AS result, '' as result2, COUNT(*) AS C FROM sp_songs WHERE artist LIKE %s GROUP BY artist ORDER BY C DESC LIMIT 10) ORDER BY result ASC LIMIT 10"
+        params = (searchterm + "%", searchterm + "%")
+        result = self.query(sql, params)
+        return self.checkReturn(result, "search_result")
     #This runs the query against the server.        
     def query(self, query, params):
         try:
             with self.connection.cursor() as c:
                 c.execute(query, params)
                 res = c.fetchall()
-                return res
+                print(params)
+                return res 
         except:
             return self.error()
     #This creates a new error message
