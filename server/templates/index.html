@@ -2,9 +2,11 @@
     <head>
         <title>Spotitunes {{id}}</title>
         <script type='text/javascript' src="{{ url_for('static',filename='jquery.min.js')}}"></script>
-        <script type='text/javascript' src="{{ url_for('static',filename='index.js')}}"></script>
+        <script src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
         <script type='text/javascript' src="{{ url_for('static',filename='materialize/js/materialize.js')}}"></script>
+        <script type='text/javascript' src="{{ url_for('static',filename='index.js')}}"></script>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='materialize/css/materialize.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css')}}">
     </head>
     <body>
         <div class="row">
