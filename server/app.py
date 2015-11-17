@@ -31,6 +31,10 @@ def mysqlCounts():
 def topArtists(name):
     return jsonify(sql.topArtists(name))
 
+@app.route("/api/search/<terms>")
+def search(terms):
+    return jsonify(sql.search(terms))
+
 if __name__ == "__main__":
     #do our startup routine here
     app.run(debug=True)
