@@ -2,21 +2,7 @@
 // Developing Locally?  Swap the comments here and start the python server.
 var baseurl = "http://tunes.redspin.net"
 //var baseurl = "http://localhost:5000"
-
-function addSearchResult(origin, string, cssclass){
-  // var newres = $("<a class='result'></a>");
-  // newres = "<a class='result'></a>";
-  // var newcontent = $("<div class='content'></div>");
-  // newcontent = "<div class='content'></div>";
-  // var newtitle = $("<div class='title'>"+string+"</div>")
-  // newtitle = "<div class='title'>"+string+"</div>";
-  var newli = $("<li class='collection-item "+cssclass+"'>"+ string + "</li>");
-  $("#search-results").append(newli);
-  //newres.append(newcontent);
-  //newcontent.append(newtitle);
-  
-  console.log(string);
-}
+var top_searchbar = new searchbar("search-results");
 
 function updateSearch(){
   //empty the list
@@ -36,24 +22,20 @@ function updateSearch(){
       //this is the callback for the AJAX - let's update search
       //console.log(res);
       if(terms==$("#search").val()){
+        var s = new searchbar("search-results");
         //the terms didnt change.
         collection.empty();
-        //var collection = $("#search-results");
+
         values = JSON.parse(values);
         for(i=0;i< values.search_result.length;i++){
-            console.log(values.search_result[i])
-            //var newli = $("<li class='collection-item db'>"+ values.search_result[i].result + " " + values.search_result[i].result2 + "</li>");
-            addSearchResult(collection,values.search_result[i].result + " " + values.search_result[i].result2, "db");
-            //collection.prepend(newli);
-            if (i >=5){break;}
+          s.addItem(values.search_result[i].result + " " + values.search_result[i].result2 , "db")
+          if (i >=5){break;}
         }
         for(i=0;i< res.length;i++){
-            //console.log(values.search_result[i])
-            //var newli = $("<li class='collection-item sc'>"+ res[i].title + " " + res[i].permalink + "</li>");
-            //collection.append(newli);
-            addSearchResult(collection, res[i].title + " " + res[i].permalink, "sc");
-            if (i >=5){break;}
+          s.addItem(res[i].title , "sc")
+          if (i >=5){break;}
         }
+        s.updateDisplay();
       }
     }
     if (terms==$("#search").val()){
@@ -61,7 +43,6 @@ function updateSearch(){
         q: terms, license: 'cc-by-sa'
       }).then(function(tracks){
         callbacksc(tracks);
-        console.log(tracks);
       });
     }
   }
@@ -94,3 +75,32 @@ $(document).ready(function() {
     initialize();
     console.log("js ready");
 });
+
+/* ----------------------------
+Brandon is writing code here.  Avoid merge conflicts: make your own header section.
+------------------------------*/
+function searchbar(tagid){
+  this.search_id = $("#" + tagid);
+  this.list = [];
+
+  this.addItem = function(item, classtype){
+    this.list.push([item, classtype]);
+  }
+  this.cl = function(){
+    this.list = [];
+    this.updateDisplay();
+  }
+  this.updateDisplay = function(){
+    this.search_id.empty();
+    for(i = 0; i<this.list.length; i++){
+      var newli = $("<li class='collection-item "+this.list[i][1]+"'>"+ this.list[i][0] + "</li>");
+      this.search_id.append(newli);
+    }
+  }
+  this.show = function(){
+    this.search_id.show();
+  }
+  this.hide = function(){
+    this.search_id.hide();
+  }
+}
