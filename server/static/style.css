@@ -4,3 +4,24 @@
 .sc {
     background: #ffb366 !important;
 }
+#search-container{
+    width:100%;
+}
+#search {
+    border-style: solid;
+    border-bottom-color: black;
+    border-width: 2px;
+    padding: 10px;
+    margin:0px;
+}
+#search:focus{
+    border-color: black;
+    box-shadow: none;
+}
+#search-results {
+    padding: 0px;
+    width:100%;
+}
+#search-results li {
+    padding: 5px;
+}
