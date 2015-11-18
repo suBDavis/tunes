@@ -119,6 +119,10 @@ function ajax(url, callback) {
   xhttp.send();
 }
 
+function onAdd(e){
+
+}
+
 function initialize(){
     window.top_searchbar = new searchbar("search-ajax");
     window.searchr = new results("search-results-table"); 
@@ -192,48 +196,58 @@ function results(tagid){
   this.ytdiv = $("#yt-results-table")
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
+  this.sr = {};
 
   this.addItem = function(dict_item, type){
     if (type == "sc"){
       this.sclist.push(dict_item);
+      this.sr[dict_item['id']] = dict_item;
     }else if (type=="yt"){
       this.ytlist.push(dict_item);
+      this.sr[dict_item['id'].videoId] = dict_item;
     }else {
       this.list.push(dict_item);
+      this.sr[dict_item.guid] = dict_item;
     }
   }
   this.updateDisplay = function(){
     var l = this.list;
     this.list = [];
     this.div.empty();
+    console.log(l);
     //console.log(this.list);
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.guid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.div.append(newnode);
     }
+    $("#search-results a").on('click',function(e){console.log(e);});
     this.show();
   }
   this.updateSC = function(){
     var l = this.sclist;
+    console.log(l);
     this.sclist = [];
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr><td class='a'>" + a.genre.substring(0 , this.maxchars) +"</td><td class='b'>" + a['title'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.id+"'><td class='a'>" + a.genre.substring(0 , this.maxchars) +"</td><td class='b'>" + a['title'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
+    $("#search-results a").on('click',function(e){console.log(e);});
     this.show();
   }
   this.updateYT = function(){
     var l = this.ytlist;
+    console.log(l);
     this.ytlist = [];
     this.ytdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr><td class='a'>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td><td class='b'>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a['id'].videoId+"'><td class='a'>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td><td class='b'>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.ytdiv.append(newnode);
     }
+    $("#search-results a").on('click',function(e){console.log(e);});
     this.show();
   }
   this.hide = function(){
