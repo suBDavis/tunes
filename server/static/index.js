@@ -76,8 +76,16 @@ function generateResults(e){
     }
     window.searchr.updateSC();
   });
-  //store the results and present them
-  var res = new results(e.target.id);
+  //now look on youtube.
+  ajax("/api/ytsearch/video/" + artist + " " + title, function(ytres){
+    //callback for when the ajax completes
+    ytres = JSON.parse(ytres);
+    //var rnode = new results("search-results-table");
+    for(var i=0;i<ytres.items.length;i++){
+      window.searchr.addItem(ytres.items[i], "yt");
+    }
+    window.searchr.updateYT();
+  });
 }
 
 function searchSC(terms, callbacksc){
@@ -176,11 +184,15 @@ function results(tagid){
   this.list = [];
   this.sclist = [];
   this.scdiv = $("#sc-results-table")
+  this.ytlist = [];
+  this.ytdiv = $("#yt-results-table")
   this.maxchars = 60;
 
   this.addItem = function(dict_item, type){
     if (type == "sc"){
       this.sclist.push(dict_item);
+    }else if (type=="yt"){
+      this.ytlist.push(dict_item);
     }else {
       this.list.push(dict_item);
     }
@@ -208,6 +220,17 @@ function results(tagid){
     }
     this.show();
   }
+  this.updateYT = function(){
+    var l = this.ytlist;
+    this.ytlist = [];
+    this.ytdiv.empty();
+    for(var i=0;i<l.length;i++){
+      var a = l[i];
+      var newnode = "<tr><td>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td></tr>";
+      this.ytdiv.append(newnode);
+    }
+    this.show();
+  }
   this.hide = function(){
     this.div.hide();
     $("#search-results").hide();
@@ -215,6 +238,7 @@ function results(tagid){
   this.show = function(){
     $("#search-results").show();
     this.scdiv.show();
+    this.ytdiv.show();
     this.div.show();
   }
 }
