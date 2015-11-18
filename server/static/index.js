@@ -46,15 +46,19 @@ function generateResults(e){
   //set search to the thing.
   var divid = e.target.id;
   var target = window.top_searchbar.find(divid);
-  var artist = target.artist == "" ? "%25" : target.artist;
-  var title = target['title'] == "" ? "%25" : target['title']
+  var artist;
+  var title;
   var searchterms = $("#search").val();
   if (divid =="sc"){
-    //search soundcloud
+    artist = searchterms;
+    title = ""
     console.log("sc");
   } else if(divid == 'yt'){
-    //search youtube
+    artist = searchterms;
+    title = ""
   } else {
+    artist = target.artist == "" ? "%25" : target.artist;
+    title = target['title'] == "" ? "%25" : target['title']
     window.top_searchbar.set(e.target.innerHTML);
     searchterms = e.target.innerHTML;
   }
