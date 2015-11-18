@@ -55,8 +55,8 @@ function generateResults(e){
   //set search to the thing.
   var divid = e.target.id;
   var target = window.top_searchbar.find(divid);
-  var artist = target.artist == "" ? "%" : target.artist;
-  var title = target['title'] == "" ? "%" : target['title']
+  var artist = target.artist == "" ? "%25" : target.artist;
+  var title = target['title'] == "" ? "%25" : target['title']
   var searchterms = $("#search").val();
   if (divid =="sc"){
     //search soundcloud
