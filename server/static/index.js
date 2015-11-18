@@ -197,6 +197,7 @@ function results(tagid){
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
+  this.finished = 0;
 
   this.addItem = function(dict_item, type){
     if (type == "sc"){
@@ -221,8 +222,9 @@ function results(tagid){
       var newnode = "<tr id='"+a.guid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.div.append(newnode);
     }
-    $("#search-results a").on('click',function(e){console.log(e);});
     this.show();
+    this.finished++;
+    this.registerEvents();
   }
   this.updateSC = function(){
     var l = this.sclist;
@@ -234,8 +236,9 @@ function results(tagid){
       var newnode = "<tr id='"+a.id+"'><td class='a'>" + a.genre.substring(0 , this.maxchars) +"</td><td class='b'>" + a['title'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
-    $("#search-results a").on('click',function(e){console.log(e);});
     this.show();
+    this.finished++;
+    this.registerEvents();
   }
   this.updateYT = function(){
     var l = this.ytlist;
@@ -247,8 +250,14 @@ function results(tagid){
       var newnode = "<tr id='"+a['id'].videoId+"'><td class='a'>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td><td class='b'>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.ytdiv.append(newnode);
     }
-    $("#search-results a").on('click',function(e){console.log(e);});
     this.show();
+    this.finished++;
+    this.registerEvents();
+  }
+  this.registerEvents = function(){
+    if (this.finished == 3){
+      $("#search-results a").on('click',function(e){console.log(e);});
+    }
   }
   this.hide = function(){
     this.div.hide();
