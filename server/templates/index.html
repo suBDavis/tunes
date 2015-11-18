@@ -13,15 +13,29 @@
     <body>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xs-6 col-xs-offset-2">
-                    <h1>Spotitunes {{id}}</h1>
-                    <div class="row">
-                        <div id="search-container">
-                            <input id='search' placeholder='Just start typing a song / artist / tag' type='text'>
+                <div class="col-xs-8">
+                    <div class='row'>
+                        <div class="col-xs-12">
+                            <h1>Spotitunes {{id}}</h1>
+                            <div id="search-container">
+                                <div class='input-field'>
+                                    <input id='search' placeholder='Just start typing a song / artist / tag' type='text'></div>
+                                <div class='collection' id='search-ajax' style='display:none;'>
+                                </div>
+                            </div>
                         </div>
-                        <ul class='collection' id='search-results' style='display:none;'>
-                        </ul>
                     </div>
+                    <div class='row'>
+                        <div class="col-xs-12">
+                            <div id="search-results">
+                                <table class="striped srt" id='search-results-table' style="display:none;">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xs-4'>
+                    <div id='playlist-wrapper'></div>
                 </div>
             </div>
         </div>

@@ -1,52 +1,84 @@
+"use strict"
 // Our custom code goes here.
 // Developing Locally?  Swap the comments here and start the python server.
 var baseurl = "http://tunes.redspin.net"
-//var baseurl = "http://localhost:5000"
-var top_searchbar = new searchbar("search-results");
+// var baseurl = "http://localhost:5000"
 
 function updateSearch(){
   //empty the list
-  var collection = $("#search-results");
+  var collection = $("#search-ajax");
   //get the search terms from the page
   var terms = $("#search").val();
-  if(terms == ""){
-    //hide search bar, it's blank.
-    collection.hide();
-  } else if (terms.length ==1){
-    //added a letter, show it again
-    collection.show();
-  }
   //create callback function we can pass to our page updaters
   var callbackdb = function(values){
     var callbacksc = function(res){
       //this is the callback for the AJAX - let's update search
       //console.log(res);
       if(terms==$("#search").val()){
-        var s = new searchbar("search-results");
+        //var s = new searchbar("search-ajax");
         //the terms didnt change.
         collection.empty();
 
         values = JSON.parse(values);
-        for(i=0;i< values.search_result.length;i++){
-          s.addItem(values.search_result[i].result + " " + values.search_result[i].result2 , "db")
-          if (i >=5){break;}
+        for(var i=0;i< values.search_result.length;i++){
+          window.top_searchbar.addItem(values.search_result[i].artist , values.search_result[i]['title'] , "db", values.search_result[i].guid)
+          if (i >=8){break;}
         }
-        for(i=0;i< res.length;i++){
-          s.addItem(res[i].title , "sc")
-          if (i >=5){break;}
-        }
-        s.updateDisplay();
+        window.top_searchbar.addItem("" , "Search SoundCloud" , "sc", "sc");
+        window.top_searchbar.addItem("" , "Search Youtube", "yt", "yt");
+        // for(i=0;i< res.length;i++){
+        //   s.addItem(res[i].title , "sc")
+        //   if (i >=5){break;}
+        // }
+        window.top_searchbar.cl();
       }
     }
     if (terms==$("#search").val()){
-      SC.get('/tracks', {
-        q: terms, license: 'cc-by-sa'
-      }).then(function(tracks){
-        callbacksc(tracks);
-      });
+      // SC.get('/tracks', {
+      //   q: terms, license: 'cc-by-sa'
+      // }).then(function(tracks){
+      //   callbacksc(tracks);
+      // });
+      callbacksc({});
     }
   }
-  ajax("/api/search/" + terms, callbackdb);
+  if(terms == ""){
+    //hide search bar, it's blank.
+    collection.hide();
+  } else {
+    collection.show();
+    ajax("/api/search/" + terms, callbackdb);
+  }
+}
+function generateResults(e){
+  window.top_searchbar.hide();
+  //set search to the thing.
+  var divid = e.target.id;
+  var target = window.top_searchbar.find(divid);
+  var artist = target.artist == "" ? "%" : target.artist;
+  var title = target['title'] == "" ? "%" : target['title']
+  var searchterms = $("#search").val();
+  if (divid =="sc"){
+    //search soundcloud
+    console.log("sc");
+  } else if(divid == 'yt'){
+    //search youtube
+  } else {
+    window.top_searchbar.set(e.target.innerHTML);
+    searchterms = e.target.innerHTML;
+  }
+  ajax("/api/search/artist/" + artist + "/title/" + title, function(res){
+    //callback for when the ajax completes
+    res = JSON.parse(res);
+    var rnode = new results("search-results-table");
+    for(var i=0;i<res.search_result.length;i++){
+      rnode.addItem(res.search_result[i]);
+    }
+    rnode.updateDisplay();
+  });
+  //ajax query for those terms
+  //store the results and present them
+  var res = new results(e.target.id);
 }
 
 function ajax(url, callback) { 
@@ -62,8 +94,10 @@ function ajax(url, callback) {
 }
 
 function initialize(){
+    window.top_searchbar = new searchbar("search-ajax");
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
+    $("#search-ajax").on('click', function(e){ generateResults(e); });
     //Let's create a soundcloud API connection
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
@@ -82,18 +116,23 @@ Brandon is writing code here.  Avoid merge conflicts: make your own header secti
 function searchbar(tagid){
   this.search_id = $("#" + tagid);
   this.list = [];
+  this.last = [];
 
-  this.addItem = function(item, classtype){
-    this.list.push([item, classtype]);
+  this.addItem = function(artist, title, classtype, divid){
+    //0 - text,
+    //1 - class
+    //2 - id
+    this.list.push({"artist": artist,"title" :title, "classtype":classtype, "divid":divid});
   }
   this.cl = function(){
-    this.list = [];
     this.updateDisplay();
+    this.last = this.list;
+    this.list = [];
   }
   this.updateDisplay = function(){
     this.search_id.empty();
-    for(i = 0; i<this.list.length; i++){
-      var newli = $("<li class='collection-item "+this.list[i][1]+"'>"+ this.list[i][0] + "</li>");
+    for(var i = 0; i<this.list.length; i++){
+      var newli = $("<a href='#" +this.list[i]["classtype"]+ "' id="+this.list[i]["divid"]+" class='collection-item "+this.list[i]["classtype"]+"'>"+ this.list[i]["artist"] + " " + this.list[i]['title'] + "</a>");
       this.search_id.append(newli);
     }
   }
@@ -103,4 +142,40 @@ function searchbar(tagid){
   this.hide = function(){
     this.search_id.hide();
   }
+  this.set = function(valu){
+    $("#search").val(valu);
+  }
+  this.find = function(divid){
+    for(var i=0;i<this.last.length;i++){
+      if (this.last[i]['divid'] == divid){
+        return this.last[i];
+      }
+    }
+  }
 }
+
+function results(tagid){
+  this.div = $("#" + tagid);
+  this.tagid = tagid;
+  this.list = [];
+
+  this.addItem = function(dict_item){
+    this.list.push(dict_item);
+  }
+
+  this.updateDisplay = function(){
+    this.div.empty();
+    //console.log(this.list);
+    for(var i=0;i<this.list.length;i++){
+      var a = this.list[i];
+      var newnode = "<tr><td>" + a.artist + "</td><td>" + a.title + "</td></tr>";
+      $("#"+this.tagid).append(newnode);
+    }
+    $("#"+this.tagid).show();
+  }
+  this.hide = function(){
+    $("#"+this.tagid).hide();
+  }
+}
+//escape key should close the search bar
+//clicking outside search should close search bar

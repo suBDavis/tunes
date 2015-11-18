@@ -1,11 +1,14 @@
-.db {
-    background: white !important;
+#search-ajax .db {
+    background: white;
 }
-.sc {
-    background: #ffb366 !important;
+#search-ajax .sc {
+    background: #ffb366;
+}
+#search-ajax .yt {
+    background: #ff9980;
 }
 #search-container{
-    width:100%;
+    
 }
 #search {
     border-style: solid;
@@ -13,15 +16,23 @@
     border-width: 2px;
     padding: 10px;
     margin:0px;
+    box-sizing: border-box;
 }
 #search:focus{
     border-color: black;
     box-shadow: none;
 }
-#search-results {
-    padding: 0px;
-    width:100%;
-}
-#search-results li {
+#search-ajax a {
     padding: 5px;
+    text-decoration: none;
+    color: #336699;
+}
+#search-ajax :hover{
+    background-color: #e0e0d1;
+}
+.srt {
+    padding: 0px;
+    font-size: 12px;
+}
+h1 {
 }

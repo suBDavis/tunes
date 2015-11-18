@@ -35,6 +35,10 @@ def topArtists(name):
 def search(terms):
     return jsonify(sql.search(terms))
 
+@app.route("/api/search/artist/<artist>/title/<title>")
+def finiteSearch(artist, title):
+    return jsonify(sql.finiteSearch(artist, title))
+
 if __name__ == "__main__":
     #do our startup routine here
     app.run(debug=True)
