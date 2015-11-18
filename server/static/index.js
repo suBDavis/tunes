@@ -26,19 +26,10 @@ function updateSearch(){
         }
         window.top_searchbar.addItem("" , "Search SoundCloud" , "sc", "sc");
         window.top_searchbar.addItem("" , "Search Youtube", "yt", "yt");
-        // for(i=0;i< res.length;i++){
-        //   s.addItem(res[i].title , "sc")
-        //   if (i >=5){break;}
-        // }
         window.top_searchbar.cl();
       }
     }
     if (terms==$("#search").val()){
-      // SC.get('/tracks', {
-      //   q: terms, license: 'cc-by-sa'
-      // }).then(function(tracks){
-      //   callbacksc(tracks);
-      // });
       callbacksc({});
     }
   }
@@ -67,18 +58,34 @@ function generateResults(e){
     window.top_searchbar.set(e.target.innerHTML);
     searchterms = e.target.innerHTML;
   }
+  //ajax query for those terms
   ajax("/api/search/artist/" + artist + "/title/" + title, function(res){
     //callback for when the ajax completes
     res = JSON.parse(res);
-    var rnode = new results("search-results-table");
+    //var rnode = new results("search-results-table");
     for(var i=0;i<res.search_result.length;i++){
-      rnode.addItem(res.search_result[i]);
+      window.searchr.addItem(res.search_result[i], "db");
     }
-    rnode.updateDisplay();
+    window.searchr.updateDisplay();
   });
-  //ajax query for those terms
+  //search soundcloud now.
+  searchSC(artist + " " + title , function(tracks){
+    for(var i=0;i< tracks.length;i++){
+      window.searchr.addItem(tracks[i] , "sc")
+      if (i >=10){break;}
+    }
+    window.searchr.updateSC();
+  });
   //store the results and present them
   var res = new results(e.target.id);
+}
+
+function searchSC(terms, callbacksc){
+  SC.get('/tracks', {
+    q: terms, license: 'cc-by-sa'
+  }).then(function(tracks){
+    callbacksc(tracks);
+  });
 }
 
 function ajax(url, callback) { 
@@ -95,6 +102,7 @@ function ajax(url, callback) {
 
 function initialize(){
     window.top_searchbar = new searchbar("search-ajax");
+    window.searchr = new results("search-results-table"); 
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
     $("#search-ajax").on('click', function(e){ generateResults(e); });
@@ -138,6 +146,7 @@ function searchbar(tagid){
   }
   this.show = function(){
     this.search_id.show();
+    
   }
   this.hide = function(){
     this.search_id.hide();
@@ -155,26 +164,51 @@ function searchbar(tagid){
 }
 
 function results(tagid){
-  this.div = $("#" + tagid);
+  this.div = $("#search-results-table");
   this.tagid = tagid;
   this.list = [];
+  this.sclist = [];
+  this.scdiv = $("#sc-results-table")
+  this.maxchars = 60;
 
-  this.addItem = function(dict_item){
-    this.list.push(dict_item);
+  this.addItem = function(dict_item, type){
+    if (type == "sc"){
+      this.sclist.push(dict_item);
+    }else {
+      this.list.push(dict_item);
+    }
   }
-
   this.updateDisplay = function(){
+    var l = this.list;
+    this.list = [];
     this.div.empty();
     //console.log(this.list);
-    for(var i=0;i<this.list.length;i++){
-      var a = this.list[i];
-      var newnode = "<tr><td>" + a.artist + "</td><td>" + a.title + "</td></tr>";
-      $("#"+this.tagid).append(newnode);
+    for(var i=0;i<l.length;i++){
+      var a = l[i];
+      var newnode = "<tr><td>" + a.artist.substring(0 , this.maxchars) + "</td><td>" + a.title.substring(0 , this.maxchars) + "</td></tr>";
+      this.div.append(newnode);
     }
-    $("#"+this.tagid).show();
+    this.show();
+  }
+  this.updateSC = function(){
+    var l = this.sclist;
+    this.sclist = [];
+    this.scdiv.empty();
+    for(var i=0;i<l.length;i++){
+      var a = l[i];
+      var newnode = "<tr><td>" + a['title'].substring(0 , this.maxchars) + "</td><td>" + a.genre.substring(0 , this.maxchars) + "</td></tr>";
+      this.scdiv.append(newnode);
+    }
+    this.show();
   }
   this.hide = function(){
-    $("#"+this.tagid).hide();
+    this.div.hide();
+    $("#search-results").hide();
+  }
+  this.show = function(){
+    $("#search-results").show();
+    this.scdiv.show();
+    this.div.show();
   }
 }
 //escape key should close the search bar
