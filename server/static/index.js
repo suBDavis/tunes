@@ -86,7 +86,14 @@ function ajax(url, callback) {
   xhttp.onreadystatechange = function() {
     if (xhttp.readyState == 4 && xhttp.status == 200) {
      //console.log("workd" + xhttp.responseText);
-     callback(xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      ajax("/api/mysql" , function(){
+        ajax(url, callback);
+      });
+     } else {
+      callback(xhttp.responseText);
+     }
     }
   };
   xhttp.open("GET", baseurl + url, true);

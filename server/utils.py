@@ -1,6 +1,10 @@
 import os
 import json
 import pymysql.cursors
+from apiclient.discovery import build
+from apiclient.errors import HttpError
+from oauth2client.tools import argparser
+
 
 class Config:
 
@@ -85,3 +89,25 @@ class SQL:
             return result
         else:
             return { setname : result }
+
+class Youtube:
+    def __init__(self):
+        self.DEVELOPER_KEY = "AIzaSyDPjXLEMUg88abHOXhL-PoOTWnkcvHU11o"
+        self.YOUTUBE_API_SERVICE_NAME = "youtube"
+        self.YOUTUBE_API_VERSION = "v3"
+
+    def youtube_search(self,options):
+        youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,
+        developerKey=self.DEVELOPER_KEY)
+        # Call the search.list method to retrieve results matching the specified
+        # query term.
+        search_response = youtube.search().list(
+            q=options.q,
+            part="id,snippet",
+            maxResults=options.max_results,
+            type=options.type
+        ).execute()
+        return search_response
+
+class YTparam(object):
+    pass

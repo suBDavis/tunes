@@ -11,11 +11,11 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css')}}">
     </head>
     <body>
-        <div class="container-fluid">
+        <div class="container">
             <div class="row">
-                <div class="col-xs-8">
+                <div class="col-sm-8">
                     <div class='row'>
-                        <div class="col-xs-12">
+                        <div class="col-sm-12">
                             <h1>Spotitunes {{id}}</h1>
                             <div id="search-container">
                                 <div class='input-field'>
@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class='row'>
-                        <div class="col-xs-12">
+                        <div class="col-sm-12">
                             <div id="search-results">
                                 <table class="striped srt" id='search-results-table' style="display:none;">
                                 </table>
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                 </div>
-                <div class='col-xs-4'>
+                <div class='col-sm-4'>
                     <div id='playlist-wrapper'></div>
                 </div>
             </div>
