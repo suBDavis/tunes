@@ -40,5 +40,22 @@
 .ytrt {
     background-color: #ff9980;
 }
+td.a {
+    width:25%;
+}
+td.b {
+    width: 70%;
+}
+td.c {
+    width:5%;
+}
+.b-small {
+    width:25px;
+    height:25px;
+    line-height: 25px;
+}
+.b-small i{
+    line-height: 25px;
+}
 h1 {
 }

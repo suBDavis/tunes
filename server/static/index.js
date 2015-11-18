@@ -191,6 +191,7 @@ function results(tagid){
   this.ytlist = [];
   this.ytdiv = $("#yt-results-table")
   this.maxchars = 60;
+  this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
 
   this.addItem = function(dict_item, type){
     if (type == "sc"){
@@ -208,7 +209,7 @@ function results(tagid){
     //console.log(this.list);
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr><td>" + a.artist.substring(0 , this.maxchars) + "</td><td>" + a.title.substring(0 , this.maxchars) + "</td></tr>";
+      var newnode = "<tr><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.div.append(newnode);
     }
     this.show();
@@ -219,7 +220,7 @@ function results(tagid){
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr><td>" + a['title'].substring(0 , this.maxchars) + "</td><td>" + a.genre.substring(0 , this.maxchars) + "</td></tr>";
+      var newnode = "<tr><td class='a'>" + a.genre.substring(0 , this.maxchars) +"</td><td class='b'>" + a['title'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
     this.show();
@@ -230,7 +231,7 @@ function results(tagid){
     this.ytdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr><td>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td></tr>";
+      var newnode = "<tr><td class='a'>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td><td class='b'>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.ytdiv.append(newnode);
     }
     this.show();
