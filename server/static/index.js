@@ -197,7 +197,6 @@ function results(tagid){
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
-  this.finished = 0;
 
   this.addItem = function(dict_item, type){
     if (type == "sc"){
@@ -223,8 +222,9 @@ function results(tagid){
       this.div.append(newnode);
     }
     this.show();
-    this.finished++;
-    this.registerEvents();
+    $("#search-results-table a").on('click',function(e){
+      window.searchr.clickEvent(e);
+    });
   }
   this.updateSC = function(){
     var l = this.sclist;
@@ -237,8 +237,9 @@ function results(tagid){
       this.scdiv.append(newnode);
     }
     this.show();
-    this.finished++;
-    this.registerEvents();
+    $("#sc-results-table a").on('click',function(e){
+      window.searchr.clickEvent(e);
+    });
   }
   this.updateYT = function(){
     var l = this.ytlist;
@@ -251,13 +252,13 @@ function results(tagid){
       this.ytdiv.append(newnode);
     }
     this.show();
-    this.finished++;
-    this.registerEvents();
+    $("#yt-results-table a").on('click',function(e){
+      window.searchr.clickEvent(e);
+    });
   }
-  this.registerEvents = function(){
-    if (this.finished == 3){
-      $("#search-results a").on('click',function(e){console.log(e);});
-    }
+  this.clickEvent = function(e){
+    var i = $(e.target).closest("tr").attr("id");//.id
+    console.log(window.searchr.sr[i]);
   }
   this.hide = function(){
     this.div.hide();
