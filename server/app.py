@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from utils import SQL, Config, Youtube, YTparam
 from flask.ext.cors import CORS
 
@@ -33,6 +33,10 @@ def mysqlCounts():
 def topArtists(name):
     return jsonify(sql.topArtists(name))
 
+#--------------------
+# Search-related queries
+#--------------------
+
 @app.route("/api/search/<terms>")
 def search(terms):
     return jsonify(sql.search(terms))
@@ -49,6 +53,33 @@ def ytsearch(query):
     setattr(options, 'type' , 'video')
     response = yt.youtube_search(options)
     return jsonify(response)
+
+#-------------------
+# Playlist-related queries - currently unimplemented
+#-------------------
+
+@app.route("/api/playlist/<plid>/song", methods=['POST'])
+def addToPL(plid):
+    #since this is a post, we can assume the client wants to add a track.
+    #let's get the other info from the POST request using 'request' library
+    song_type = request.form['type']
+    song_title = request.form['title']
+    song_artist = request.form['artist']
+    resource_id = request.form['song_id']
+    playlist_id = plid
+    return jsonify(sql.addToPL(song_type, resource_id, song_title, song_artist, playlist_id))
+
+@app.route("/api/playlist/<plid>/song", methods=["DELETE"])
+def removeFromPL(plid):
+    #since this is a delete, we can assume the client wants to remove a track.
+    #because the track must already be in the DB, we only need songid and plid
+    song_id = request.form['song_id']
+    playlist_id = plid  
+    return jsonify(sql.removeFromPL(song_id, playlist_id))
+
+@app.route("/api/playlist/<plid>", methods=['GET'])
+def getPL(plid):
+    return jsonify(sql.getPL(plid))
 
 if __name__ == "__main__":
     #do our startup routine here
