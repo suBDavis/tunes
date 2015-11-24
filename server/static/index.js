@@ -141,9 +141,6 @@ $(document).ready(function() {
     console.log("js ready");
 });
 
-/* ----------------------------
-Brandon is writing code here.  Avoid merge conflicts: make your own header section.
-------------------------------*/
 function searchbar(tagid){
   this.search_id = $("#" + tagid);
   this.list = [];
@@ -257,7 +254,7 @@ function results(tagid){
     });
   }
   this.clickEvent = function(e){
-    var i = $(e.target).closest("tr").attr("id");//.id
+    var i = $(e.target).closest("tr").attr("id");
     console.log(window.searchr.sr[i]);
   }
   this.hide = function(){
