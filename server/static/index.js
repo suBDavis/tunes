@@ -1,8 +1,8 @@
 "use strict"
 // Our custom code goes here.
 // Developing Locally?  Swap the comments here and start the python server.
-var baseurl = "http://tunes.redspin.net"
-// var baseurl = "http://localhost:5000"
+// var baseurl = "http://tunes.redspin.net"
+var baseurl = "http://localhost:5000"
 
 function updateSearch(){
   //empty the list
