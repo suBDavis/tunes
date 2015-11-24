@@ -70,6 +70,32 @@ class SQL:
         params = (title, artist)
         result = self.query(sql, params)
         return self.checkReturn(result, "search_result")
+    
+    #this section manages playlist stuff
+
+    def addToPL(self, type, resourceID, title, artist, plid):
+        #we will pass it this for every insert.  
+        #type:  sc - soundcloud
+        #       yt - youtube
+        #       db - already in our db.
+        #resourceid
+        #       the song guid if we already have it
+        #       the soundcloud resource id if they have it
+        #       the youtube resource id if yt.  
+        #Let's put out user-created playlists into a new table called "playlists"
+        #   reason being, the sp_playlists table is just too damn big and we don't want to corrupt or screw it up.
+        #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
+        pass
+
+    def removeFromPL(self, songid, plid):
+        #if a remove happens, then the song must already have been in the db.  
+        #if the song was already in the db, we can referr to it by the db it (guid from sp_songs)
+        #if either songid or plid are not found, return a new internal error.
+        pass
+
+    def getPL(self, plid):
+        pass
+
     #This runs the query against the server.        
     def query(self, query, params):
         try:
