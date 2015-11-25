@@ -22,16 +22,14 @@ function song(songtype, songid, resourceid, artist, songtitle){
 // This is what happens when someone click's the + button next to a search result.
 //-------------------------------------------
 function onAdd(song_meta){
-  //At this pont, the song_meta is whatever attributes the soundcloud/youtube/daatabase api assign.  
-  //this is not a song object.  We should either create the song object here so that songs have universal proprties.
-  //another option is to create the song object before this (probably from results.clickevent)
+  //this is a song object (from above) - it has all the properties listed
+  //it might not have a songid.  If it doesn't, this means the song is not in our database yet (it came from yt or sc)
   //basically the  youtube and soundcloud players will need to have access to a universal playlist (pl_manager currently)
   //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
 
   console.log(song_meta);//here's whats inside.
 
-  // agnostic_song = new song(blah blah);
-  // playlist.append(agnostic_song);
+  // playlist.append(song_meta);
 
   // the playlist object is in playlist.js (same folder)
   // the youtube player is in ytplayer.js
@@ -147,14 +145,20 @@ function generateResults(e){
     res = JSON.parse(res);
     //var rnode = new results("search-results-table");
     for(var i=0;i<res.search_result.length;i++){
-      window.searchr.addItem(res.search_result[i], "db");
+      var sdata = res.search_result[i];
+      //create ubiquitous song object.
+      var result_song = new song(sdata.type, sdata.guid, sdata.resource_id, sdata.artist, sdata.title);
+      window.searchr.addItem(result_song, "db");
     }
     window.searchr.updateDisplay();
   });
   //search soundcloud now.
   searchSC(artist + " " + title , function(tracks){
     for(var i=0;i< tracks.length;i++){
-      window.searchr.addItem(tracks[i] , "sc")
+      var sdata = tracks[i];
+      //create an actual song object and stop being a bad programer
+      var result_song = new song("soundcloud" , null , sdata.id, sdata.genre, sdata.title);
+      window.searchr.addItem(result_song , "sc");
       if (i >=10){break;}
     }
     window.searchr.updateSC();
@@ -165,7 +169,10 @@ function generateResults(e){
     ytres = JSON.parse(ytres);
     //var rnode = new results("search-results-table");
     for(var i=0;i<ytres.items.length;i++){
-      window.searchr.addItem(ytres.items[i], "yt");
+      var sdata = ytres.items[i];
+      //create an actual song object and stop being a bad programer
+      var result_song = new song("youtube" , null , sdata.id.videoId, sdata.snippet.channelTitle, sdata.snippet.title);
+      window.searchr.addItem(result_song, "yt");
     }
     window.searchr.updateYT();
   });
@@ -246,24 +253,32 @@ function results(tagid){
   this.addItem = function(dict_item, type){
     if (type == "sc"){
       this.sclist.push(dict_item);
-      this.sr[dict_item['id']] = dict_item;
+      this.sr[dict_item.resource_id] = dict_item;
     }else if (type=="yt"){
       this.ytlist.push(dict_item);
-      this.sr[dict_item['id'].videoId] = dict_item;
+      this.sr[dict_item.resource_id] = dict_item;
     }else {
       this.list.push(dict_item);
-      this.sr[dict_item.guid] = dict_item;
+      this.sr[dict_item.resource_id] = dict_item;
+    }
+  }
+  this.updateUI = function(){
+    for(var i = 0; i< keys(this.sr); i++){
+      song_obj = this.sr[i];
+      if(!song_obj.wasChecked){
+        //finish this later
+      }
     }
   }
   this.updateDisplay = function(){
     var l = this.list;
     this.list = [];
     this.div.empty();
-    console.log(l);
+    //console.log(l);
     //console.log(this.list);
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.guid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.guid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.div.append(newnode);
     }
     this.show();
@@ -273,12 +288,12 @@ function results(tagid){
   }
   this.updateSC = function(){
     var l = this.sclist;
-    console.log(l);
+    //console.log(l);
     this.sclist = [];
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.id+"'><td class='a'>" + a.genre.substring(0 , this.maxchars) +"</td><td class='b'>" + a['title'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.id+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a['songtitle'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
     this.show();
@@ -288,12 +303,12 @@ function results(tagid){
   }
   this.updateYT = function(){
     var l = this.ytlist;
-    console.log(l);
+    //console.log(l);
     this.ytlist = [];
     this.ytdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a['id'].videoId+"'><td class='a'>" + a.snippet.channelTitle.substring(0 , this.maxchars) + "</td><td class='b'>" + a.snippet.title.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resource_id+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.ytdiv.append(newnode);
     }
     this.show();

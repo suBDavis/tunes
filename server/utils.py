@@ -66,7 +66,7 @@ class SQL:
         return self.checkReturn(result, "search_result")
 
     def finiteSearch(self, artist, title):
-        sql = "SELECT artist, title, album, guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s LIMIT 10"
+        sql = "SELECT artist, title, album, guid, resource_id, type FROM sp_songs S JOIN resource R ON S.rid = R.rid WHERE title LIKE %s AND artist LIKE %s LIMIT 10"
         params = (title, artist)
         result = self.query(sql, params)
         return self.checkReturn(result, "search_result")
