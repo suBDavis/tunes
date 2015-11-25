@@ -64,7 +64,7 @@ function ajax(url, callback) {
 function initialize(){
     window.top_searchbar = new searchbar("search-ajax");
     window.searchr = new results("search-results-table"); 
-    pl_manager = new playlist();
+    //pl_manager was already initialized
    
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
@@ -74,6 +74,8 @@ function initialize(){
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
+
+    initializeSCPlayer();
 }
 
 //========================================
@@ -179,11 +181,13 @@ function generateResults(e){
 }
 
 function searchSC(terms, callbacksc){
+
   SC.get('/tracks', {
-    q: terms, license: 'cc-by-sa'
+    q: terms
   }).then(function(tracks){
     callbacksc(tracks);
   });
+
 }
 
 $(document).ready(function() {
