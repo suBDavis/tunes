@@ -3,8 +3,7 @@ var playlist = function(){
     this.pointer = 0;
 
     this.getNext = function(){
-        return this.plist[this.pointer]
-        this.pointer++;
+        return this.plist[this.pointer++];
     }
     this.append = function(songid){
         this.plist.push(songid);
