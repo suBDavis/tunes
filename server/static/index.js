@@ -1,9 +1,86 @@
 "use strict"
-// Our custom code goes here.
+
 // Developing Locally?  Swap the comments here and start the python server.
 // var baseurl = "http://tunes.redspin.net"
 var baseurl = "http://localhost:5000"
-var pl_manager = null;
+
+// this is set from initialize() where we instantiate the playlist.js playlist object
+var pl_manager = null; 
+
+//-------------------------------------------
+// Song object that is ambuguous to source 
+//-------------------------------------------
+function song(songtype, songid, resourceid, artist, songtitle){
+  this.songtype = songtype;
+  this.songid = songid;
+  this.resourceid = resourceid; //either the youtube id or the souncloud resource id.
+  this.artist = artist;
+  this.songtitle = songtitle;
+}
+
+//-------------------------------------------
+// This is what happens when someone click's the + button next to a search result.
+//-------------------------------------------
+function onAdd(song_meta){
+  //At this pont, the song_meta is whatever attributes the soundcloud/youtube/daatabase api assign.  
+  //this is not a song object.  We should either create the song object here so that songs have universal proprties.
+  //another option is to create the song object before this (probably from results.clickevent)
+  //basically the  youtube and soundcloud players will need to have access to a universal playlist (pl_manager currently)
+  //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
+
+  console.log(song_meta);//here's whats inside.
+
+  // agnostic_song = new song(blah blah);
+  // playlist.append(agnostic_song);
+
+  // the playlist object is in playlist.js (same folder)
+  // the youtube player is in ytplayer.js
+
+}
+
+//------------------------------------------
+// Ajax requests can use this helper method.  Pass it a callback for what you want it to do with your results
+//------------------------------------------
+function ajax(url, callback) { 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+     //console.log("workd" + xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      ajax("/api/mysql" , function(){
+        ajax(url, callback);
+      });
+     } else {
+      callback(xhttp.responseText);
+     }
+    }
+  };
+  xhttp.open("GET", baseurl + url, true);
+  xhttp.send();
+}
+
+//---------------------------------------
+//here's the entry point for the JS file
+//---------------------------------------
+function initialize(){
+    window.top_searchbar = new searchbar("search-ajax");
+    window.searchr = new results("search-results-table"); 
+    pl_manager = new playlist();
+   
+    //register listener for search box.
+    $("#search").on('input', function(){ updateSearch(); });
+    $("#search-ajax").on('click', function(e){ generateResults(e); });
+   
+    //Let's create a soundcloud API connection
+    SC.initialize({
+      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
+    });
+}
+
+//========================================
+// WARNING: Spaghetti code below this line!
+//========================================
 
 function updateSearch(){
   //empty the list
@@ -42,6 +119,7 @@ function updateSearch(){
     ajax("/api/search/" + terms, callbackdb);
   }
 }
+
 function generateResults(e){
   window.top_searchbar.hide();
   //set search to the thing.
@@ -101,44 +179,9 @@ function searchSC(terms, callbacksc){
   });
 }
 
-function ajax(url, callback) { 
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (xhttp.readyState == 4 && xhttp.status == 200) {
-     //console.log("workd" + xhttp.responseText);
-     var rtext = JSON.parse(xhttp.responseText);
-     if(rtext['error']){
-      ajax("/api/mysql" , function(){
-        ajax(url, callback);
-      });
-     } else {
-      callback(xhttp.responseText);
-     }
-    }
-  };
-  xhttp.open("GET", baseurl + url, true);
-  xhttp.send();
-}
-
-function onAdd(e){
-
-}
-
-function initialize(){
-    window.top_searchbar = new searchbar("search-ajax");
-    window.searchr = new results("search-results-table"); 
-    pl_manager = new playlist();
-    //register listener for search box.
-    $("#search").on('input', function(){ updateSearch(); });
-    $("#search-ajax").on('click', function(e){ generateResults(e); });
-    //Let's create a soundcloud API connection
-    SC.initialize({
-      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
-    });
-}
-
 $(document).ready(function() {
     // Page is ready.  run this code.
+    //this is the entry point for our javascript
     initialize();
     console.log("js ready");
 });
@@ -184,6 +227,9 @@ function searchbar(tagid){
     }
   }
 }
+//escape key should close the search bar
+//clicking outside search should close search bar
+//I haven't done that yet.
 
 function results(tagid){
   this.div = $("#search-results-table");
@@ -258,9 +304,10 @@ function results(tagid){
   this.clickEvent = function(e){
     var i = $(e.target).closest("tr").attr("id");
     var clicked = window.searchr.sr[i];
-    console.log(clicked);
+    onAdd(clicked);
+    // console.log(clicked);
     //this is sample code I'm messing with.  Right now it will only work for the youtube section.
-    pl_manager.append(clicked.id.videoId);
+    // pl_manager.append(clicked.id.videoId);
   }
   this.hide = function(){
     this.div.hide();
@@ -273,5 +320,3 @@ function results(tagid){
     this.div.show();
   }
 }
-//escape key should close the search bar
-//clicking outside search should close search bar
