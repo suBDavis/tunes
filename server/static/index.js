@@ -251,15 +251,16 @@ function results(tagid){
   this.sr = {};
 
   this.addItem = function(dict_item, type){
+    //console.log(dict_item);
     if (type == "sc"){
       this.sclist.push(dict_item);
-      this.sr[dict_item.resource_id] = dict_item;
+      this.sr[dict_item.resourceid] = dict_item;
     }else if (type=="yt"){
       this.ytlist.push(dict_item);
-      this.sr[dict_item.resource_id] = dict_item;
+      this.sr[dict_item.resourceid] = dict_item;
     }else {
       this.list.push(dict_item);
-      this.sr[dict_item.resource_id] = dict_item;
+      this.sr[dict_item.resourceid] = dict_item;
     }
   }
   this.updateUI = function(){
@@ -278,7 +279,7 @@ function results(tagid){
     //console.log(this.list);
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.guid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.div.append(newnode);
     }
     this.show();
@@ -293,7 +294,7 @@ function results(tagid){
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.id+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a['songtitle'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a['songtitle'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
     this.show();
@@ -308,7 +309,7 @@ function results(tagid){
     this.ytdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.resource_id+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.ytdiv.append(newnode);
     }
     this.show();
