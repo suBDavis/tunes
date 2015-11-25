@@ -3,6 +3,7 @@
 // Developing Locally?  Swap the comments here and start the python server.
 // var baseurl = "http://tunes.redspin.net"
 var baseurl = "http://localhost:5000"
+var pl_manager = null;
 
 function updateSearch(){
   //empty the list
@@ -126,6 +127,7 @@ function onAdd(e){
 function initialize(){
     window.top_searchbar = new searchbar("search-ajax");
     window.searchr = new results("search-results-table"); 
+    pl_manager = new playlist();
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
     $("#search-ajax").on('click', function(e){ generateResults(e); });
@@ -255,7 +257,10 @@ function results(tagid){
   }
   this.clickEvent = function(e){
     var i = $(e.target).closest("tr").attr("id");
-    console.log(window.searchr.sr[i]);
+    var clicked = window.searchr.sr[i];
+    console.log(clicked);
+    //this is sample code I'm messing with.  Right now it will only work for the youtube section.
+    pl_manager.append(clicked.id.videoId);
   }
   this.hide = function(){
     this.div.hide();
