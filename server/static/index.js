@@ -16,6 +16,7 @@ function song(songtype, songid, resourceid, artist, songtitle){
   this.resourceid = resourceid; //either the youtube id or the souncloud resource id.
   this.artist = artist;
   this.songtitle = songtitle;
+  this.sc_url; //this param is only for soundcloud because soundcloud API is very poorly designed and I can't get this with an ID
 }
 
 //-------------------------------------------
@@ -160,6 +161,8 @@ function generateResults(e){
       var sdata = tracks[i];
       //create an actual song object and stop being a bad programer
       var result_song = new song("soundcloud" , null , sdata.id, sdata.genre, sdata.title);
+      //add the permalink url
+      result_song.sc_url = sdata.permalink_url;
       window.searchr.addItem(result_song , "sc");
       if (i >=10){break;}
     }
@@ -181,13 +184,11 @@ function generateResults(e){
 }
 
 function searchSC(terms, callbacksc){
-
   SC.get('/tracks', {
     q: terms
   }).then(function(tracks){
     callbacksc(tracks);
   });
-
 }
 
 $(document).ready(function() {

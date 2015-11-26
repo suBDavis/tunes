@@ -54,3 +54,8 @@ var scplayer;
 function initializeSCPlayer(){
   scplayer = SC.Widget("scplayer");
 }
+function scLoadSong(id){
+  url = "http://api.soundcloud.com/tracks/" + id
+  options = {"show_artwork" : false};
+  scplayer.load(url, options);
+}
