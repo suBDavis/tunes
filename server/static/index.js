@@ -22,19 +22,47 @@ function song(songtype, songid, resourceid, artist, songtitle){
 // This is what happens when someone click's the + button next to a search result.
 //-------------------------------------------
 function onAdd(song_meta){
+	
   //this is a song object (from above) - it has all the properties listed
   //it might not have a songid.  If it doesn't, this means the song is not in our database yet (it came from yt or sc)
   //basically the  youtube and soundcloud players will need to have access to a universal playlist (pl_manager currently)
   //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
-
-  console.log(song_meta);//here's whats inside.
-
-  // playlist.append(song_meta);
+  //console.log(song_meta);//here's whats inside.
+  console.log(";)");
+  
+   current_pld.addSong(song_meta);
+   //playlist.append(song_meta);
+   
 
   // the playlist object is in playlist.js (same folder)
   // the youtube player is in ytplayer.js
 
 }
+
+var current_pl = function(){
+	this.div=$("#current-pl");
+	this.maxchars = 60;
+	this.pl = new playlist();
+	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
+	this.rids = {};
+	
+	this.addSong = function(song){
+		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		this.div.append(newnode);
+		this.pl.append(song);
+		this.rids[song.resourceid] = song;
+	    $("#current-pl a").on('click',function(e){
+	      window.current_pld.clickEvent(e);
+	    });
+	}
+    this.clickEvent = function(e){
+      var i = $(e.target).closest("tr").attr("id");
+	  $(e.target).closest("tr").remove();
+      var clicked = window.current_pld.rids[i];
+      this.pl.remove(clicked);
+	  console.log("clicked bruh");	
+  }
+};
 
 //------------------------------------------
 // Ajax requests can use this helper method.  Pass it a callback for what you want it to do with your results
@@ -64,6 +92,8 @@ function ajax(url, callback) {
 function initialize(){
     window.top_searchbar = new searchbar("search-ajax");
     window.searchr = new results("search-results-table"); 
+	window.current_pld = new current_pl("current-pl");
+	//window.current_pl = new pl_div();
     pl_manager = new playlist();
    
     //register listener for search box.
@@ -79,6 +109,10 @@ function initialize(){
 //========================================
 // WARNING: Spaghetti code below this line!
 //========================================
+
+function current_pl(){
+	this.pl_div = $("<div>Playlist</div>");
+}
 
 function updateSearch(){
   //empty the list
@@ -238,6 +272,8 @@ function searchbar(tagid){
 //clicking outside search should close search bar
 //I haven't done that yet.
 
+
+
 function results(tagid){
   this.div = $("#search-results-table");
   this.tagid = tagid;
@@ -249,7 +285,7 @@ function results(tagid){
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
-
+  
   this.addItem = function(dict_item, type){
     //console.log(dict_item);
     if (type == "sc"){
