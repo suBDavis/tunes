@@ -108,8 +108,8 @@ class SQL:
             result = self.query(sql, params)
             print(result)
             
-        sql = "INSERT INTO relation (plid, songid, type) VALUES (%s, %s, %s)"
-        params = (plid, resourceID, songtype)
+        sql = "INSERT INTO relation (plid, rid, songtype, title, artist) VALUES (%s, %s, %s, %s, %s)"
+        params = (plid, resourceID, songtype, title, artist)
         result = self.query(sql, params)
         return {'plid' : plid} 
 
@@ -121,7 +121,10 @@ class SQL:
         pass
 
     def getPL(self, plid):
-        pass
+        sql="SELECT * FROM relation WHERE plid=%s"
+        params=(plid)
+        result = self.query(sql,params)
+        return(self.checkReturn(result, "pl_result"))
 
     #This runs the query against the server.        
     def query(self, query, params):

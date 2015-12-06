@@ -22,7 +22,6 @@ var playlist = function(){
 		for (var i=0;i<this.plist.length;i++){ //lol sorry i know there is a better way to do this i just dont know what it is rn
 			if (this.plist[i].resourceid===song.resourceid){ 
 				this.plist.splice(i, 1);
-				break;
 			}
 		}
 	}
@@ -30,6 +29,12 @@ var playlist = function(){
 	this.setplid = function(newplid){
 		this.plid=newplid;
 		console.log(this.plid);
+	}
+	
+	this.new = function(plid){
+		this.plist=[];
+		this.pointer=0;
+		this.plid=plid;
 	}
 	
 };
