@@ -59,3 +59,45 @@ function scLoadSong(id){
   options = {"show_artwork" : false};
   scplayer.load(url, options);
 }
+// ====================================
+// ======== Universal Player ==========
+// ====================================
+// ......always use this.
+
+var player;
+
+function initializePlayer(){
+  //get soundcloud ready
+  initializeSCPlayer();
+  //create the universal player
+  player = new uniPlayer(ytplayer, scplayer);
+}
+
+function uniPlayer(youtube, soundcloud){
+  this.currentMode = "yt";
+  this.yt = youtube;
+  this.sc = soundcloud;
+  //this player will also use pl_manager
+
+  this.play = function(){
+    if(this.mode == "yt"){
+      this.yt.playVideo();
+    }
+    else{
+      this.sc.play();
+    }
+  }
+
+  this.pause = function(){
+    //todo
+  }
+  this.onSongEnd = function(){
+    //decide what song comes next and how to load it.
+  }
+  this.skip = function(){
+    //what do we do if skip is pressed?
+  }
+  this.playIndexFromPlaylist = function(index){
+    //what to do if a user clicks play on a particular song in the PL
+  }
+}

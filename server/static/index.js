@@ -2,7 +2,7 @@
 
 // Developing Locally?  Swap the comments here and start the python server.
 // var baseurl = "http://tunes.redspin.net"
-var baseurl = "http://localhost:5000"
+ var baseurl = "http://localhost:5000"
 
 // this is set from initialize() where we instantiate the playlist.js playlist object
 var pl_manager = null; 
@@ -76,7 +76,7 @@ function initialize(){
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
 
-    initializeSCPlayer();
+    //initializeSCPlayer();
 }
 
 //========================================

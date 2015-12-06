@@ -25,12 +25,15 @@
                             <div id="search-results" style='display:none;'>
                                 <h4>Search</h4>
                                 <table class="striped srt" id='search-results-table' style="display:none;">
+                                    <tr><td>No results</td></tr>
                                 </table>
                                 <h4>SoundCloud</h4>
                                 <table class="striped scrt" id='sc-results-table' style="display:none;">
+                                    <tr><td>No results</td></tr>
                                 </table>
                                 <h4>YouTube</h4>
                                 <table class="striped ytrt" id='yt-results-table' style="display:none;">
+                                    <tr><td>No results</td></tr>
                                 </table>
                             </div>
                         </div>
@@ -47,7 +50,7 @@
     <script type='text/javascript' src="{{ url_for('static',filename='jquery.min.js')}}"></script>
     <script type='text/javascript' src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
     <!--<script type='text/javascript' src="{{ url_for('static',filename='semantic/semantic.min.js')}}"></script>-->
-    <script type='text/javascript' src="{{ url_for('static',filename='soundcloud_player_api.js')}}"></script>
+    <!--<script type='text/javascript' src="{{ url_for('static',filename='soundcloud_player_api.js')}}"></script>  -->
     <script type='text/javascript' src="{{ url_for('static',filename='playlist.js')}}"></script>
     <script type='text/javascript' src="{{ url_for('static',filename='ytplayer.js')}}"></script>
     <script type='text/javascript' src="{{ url_for('static',filename='index.js')}}"></script>
