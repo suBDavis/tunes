@@ -28,7 +28,7 @@ function onAdd(song_meta){
   //basically the  youtube and soundcloud players will need to have access to a universal playlist (pl_manager currently)
   //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
   //console.log(song_meta);//here's whats inside.
-  console.log(";)");
+  //console.log(";)");
   
    current_pld.addSong(song_meta);
    //playlist.append(song_meta);
@@ -46,6 +46,10 @@ var current_pl = function(){
 	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
 	this.rids = {};
 	
+	var plreturn=function(plid){
+		
+	}
+	
 	this.addSong = function(song){
 		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
 		this.div.append(newnode);
@@ -54,15 +58,39 @@ var current_pl = function(){
 	    $("#current-pl a").on('click',function(e){
 	      window.current_pld.clickEvent(e);
 	    });
+		//ajax_post("/api/playlist/"+this.pl.plid + "/song/" + "type/" + song.songtype + "/resourceID/" + song.resourceid + "/title/" + song.songtitle + "/artist/" + song.artist, plreturn);
+		ajax_post_song("/api/playlist/"+this.pl.plid + "/song", song, plreturn);
+		//ajax_post_song("/api/playlist/"+this.pl.plid, plreturn);
+	
 	}
     this.clickEvent = function(e){
       var i = $(e.target).closest("tr").attr("id");
 	  $(e.target).closest("tr").remove();
       var clicked = window.current_pld.rids[i];
-      this.pl.remove(clicked);
-	  console.log("clicked bruh");	
+      this.pl.remove(clicked);	  
   }
 };
+
+function ajax_post_song(url, song, callback) { 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+     //console.log("workd" + xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      ajax("/api/mysql" , function(){
+        ajax(url, callback);
+      });
+     } else {
+      callback(xhttp.responseText);
+     }
+    }
+  };
+  xhttp.open("POST", baseurl + url, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send("type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist);
+}
+
 
 //------------------------------------------
 // Ajax requests can use this helper method.  Pass it a callback for what you want it to do with your results

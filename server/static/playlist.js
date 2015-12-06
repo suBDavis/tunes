@@ -1,4 +1,5 @@
 var playlist = function(){
+	this.plid=0; //starts at 0 
     this.plist = [];
     this.pointer = 0;
 
@@ -24,6 +25,10 @@ var playlist = function(){
 				break;
 			}
 		}
+	}
+	
+	this.setplid = function(newplid){
+		this.plid=newplid;
 	}
 	
 };

@@ -4,7 +4,8 @@ import pymysql.cursors
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 from oauth2client.tools import argparser
-
+import string
+import random
 
 class Config:
 
@@ -12,7 +13,7 @@ class Config:
         #Load config into memory and print version
         fdiv = "/"
         if os.name == "nt":
-            # change based on OS - Windows is "nt"? WTF
+            # change based on OS - Windows is "nt"? WTF 
             fdiv = "\\"
         basepath = os.path.dirname(os.path.abspath(__file__)) #this works on any OS now
         with open(basepath + fdiv + 'config.json') as config_file:
@@ -73,7 +74,12 @@ class SQL:
     
     #this section manages playlist stuff
 
-    def addToPL(self, type, resourceID, title, artist, plid):
+
+    def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+        
+    def addToPL(self, songtype, resourceID, title, artist, plid):
+        
         #we will pass it this for every insert.  
         #type:  sc - soundcloud
         #       yt - youtube
@@ -85,7 +91,27 @@ class SQL:
         #Let's put out user-created playlists into a new table called "playlists"
         #   reason being, the sp_playlists table is just too damn big and we don't want to corrupt or screw it up.
         #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
-        pass
+        
+        #JS playlist id == 0 --> just created, doesn't exist yet
+        if plid == '0':
+            #sql = "SELECT UUID()"
+            #params=None
+            #result = self.query(sql, params)
+            #plid = result[0]
+            plid = self.id_generator()   #TODO: check if this has been used before
+            print (plid)
+            sql = "INSERT INTO playlists (plid, name) VALUES (%s, %s)"
+            params = (plid, 'New Playlist') 
+            #sql = "select guid from sp_playlists where name=%s"
+            #params = ('rainy weather',)
+            result = self.query(sql, params)
+            print(result)
+            
+        sql = "INSERT INTO relation (plid, songid, type) VALUES (%s, %s, %s)"
+        params = (plid, resourceID, songtype)
+        result = self.query(sql, params)
+        return ("plid" : plid)  
+
 
     def removeFromPL(self, songid, plid):
         #if a remove happens, then the song must already have been in the db.  
@@ -101,8 +127,9 @@ class SQL:
         try:
             with self.connection.cursor() as c:
                 c.execute(query, params)
+                self.connection.commit()    #commit the changes to db or they wont happen. srsly wtf this took me 30 min to find because literally who makes changes to a database and doesnt want them to stay there??????? ok tbh i guess i can think of a bunch of reasons but im still bitter 
                 res = c.fetchall()
-                #print(params)
+                print(params)
                 return res 
         except:
             return self.error()
