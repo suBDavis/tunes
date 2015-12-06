@@ -29,6 +29,7 @@ var playlist = function(){
 	
 	this.setplid = function(newplid){
 		this.plid=newplid;
+		console.log(this.plid);
 	}
 	
 };

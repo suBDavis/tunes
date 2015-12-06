@@ -47,7 +47,11 @@ var current_pl = function(){
 	this.rids = {};
 	
 	var plreturn=function(plid){
-		
+		plid = JSON.parse(plid);
+		console.log(plid);
+		plid = plid['plid'];
+		console.log(plid);
+		window.current_pld.pl.setplid(plid);
 	}
 	
 	this.addSong = function(song){

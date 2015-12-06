@@ -93,6 +93,7 @@ class SQL:
         #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
         
         #JS playlist id == 0 --> just created, doesn't exist yet
+        print (plid)
         if plid == '0':
             #sql = "SELECT UUID()"
             #params=None
@@ -110,7 +111,7 @@ class SQL:
         sql = "INSERT INTO relation (plid, songid, type) VALUES (%s, %s, %s)"
         params = (plid, resourceID, songtype)
         result = self.query(sql, params)
-        return result  
+        return {'plid' : plid} 
 
 
     def removeFromPL(self, songid, plid):
@@ -130,6 +131,7 @@ class SQL:
                 self.connection.commit()    #commit the changes to db or they wont happen. srsly wtf this took me 30 min to find because literally who makes changes to a database and doesnt want them to stay there??????? ok tbh i guess i can think of a bunch of reasons but im still bitter 
                 res = c.fetchall()
                 print(params)
+                #print (res)
                 return res 
         except:
             return self.error()
