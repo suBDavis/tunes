@@ -59,7 +59,7 @@ var current_pl = function(){
 	      window.current_pld.clickEvent(e);
 	    });
 		//ajax_post("/api/playlist/"+this.pl.plid + "/song/" + "type/" + song.songtype + "/resourceID/" + song.resourceid + "/title/" + song.songtitle + "/artist/" + song.artist, plreturn);
-		ajax_post_song("/api/playlist/"+this.pl.plid + "/song", song, plreturn);
+		ajax_post("/api/playlist/"+this.pl.plid + "/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, plreturn);
 		//ajax_post_song("/api/playlist/"+this.pl.plid, plreturn);
 	
 	}
@@ -71,7 +71,7 @@ var current_pl = function(){
   }
 };
 
-function ajax_post_song(url, song, callback) { 
+function ajax_post(url, postinfo, callback) { 
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (xhttp.readyState == 4 && xhttp.status == 200) {
@@ -88,7 +88,7 @@ function ajax_post_song(url, song, callback) {
   };
   xhttp.open("POST", baseurl + url, true);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhttp.send("type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist);
+  xhttp.send(postinfo);
 }
 
 

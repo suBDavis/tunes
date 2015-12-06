@@ -110,7 +110,7 @@ class SQL:
         sql = "INSERT INTO relation (plid, songid, type) VALUES (%s, %s, %s)"
         params = (plid, resourceID, songtype)
         result = self.query(sql, params)
-        return ("plid" : plid)  
+        return result  
 
 
     def removeFromPL(self, songid, plid):
