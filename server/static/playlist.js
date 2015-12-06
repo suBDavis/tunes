@@ -38,7 +38,7 @@ var playlist = function(){
 	}
 	
 	this.setlastorder = function(orderi){
-		(this.plist[this.plist.length-1]).setorderi(orderi);
+		(this.plist[this.plist.length-1]).orderi(orderi);
 	}
 	
 };

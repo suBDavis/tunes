@@ -10,17 +10,13 @@ var pl_manager = null;
 //-------------------------------------------
 // Song object that is ambuguous to source 
 //-------------------------------------------
-function song(songtype, songid, resourceid, artist, songtitle){
+function song(songtype, songid, resourceid, artist, songtitle,orderi){
   this.songtype = songtype;
   this.songid = songid;
   this.resourceid = resourceid; //either the youtube id or the souncloud resource id.
   this.artist = artist;
   this.songtitle = songtitle;
-  this.orderi;
-  
-  this.setorderi=function(orderi){
-	  this.orderi=orderi;
-  }
+  this.orderi = orderi;
 }
 
 //-------------------------------------------
@@ -55,6 +51,7 @@ var current_pl = function(){
 	this.rids = {};
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
+	this.lastsong;
 	
 	this.enter_pl.submit(function (e) {
 		e.preventDefault();
@@ -77,7 +74,8 @@ var current_pl = function(){
 			window.current_pld.divid.empty();
 			window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
 			for (var i=0; i < res.pl_result.length; i++){
-				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title']);
+				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title'],res.pl_result[i]['orderi']);
+				console.log(s.orderi)
 				window.current_pld.addSongNodeOnly(s);
 			}
 			//window.current_pld.pl.empty();
@@ -91,8 +89,9 @@ var current_pl = function(){
 		var plid = res['plid'];
 		var orderi = res['orderi'];
 		console.log(plid);
+		console.log(orderi);
 		window.current_pld.pl.setplid(plid);
-		window.current_pld.pl.setlastorder(orderi);
+		window.current_pld.lastsong.orderi=orderi;
 		window.current_pld.divid.empty();
 		window.current_pld.divid.append("Current Playlist ID: "+plid);
 	}
@@ -104,7 +103,8 @@ var current_pl = function(){
 		this.rids[song.resourceid] = song;
 	    $("#current-pl a").on('click',function(e){
 	      window.current_pld.clickEvent(e);
-	    });
+		});
+		this.lastsong = song;
 		ajax_post("/api/playlist/"+this.pl.plid + "/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, plreturn);
 	}
 	
@@ -115,20 +115,21 @@ var current_pl = function(){
 		this.rids[song.resourceid] = song;
 	    $("#current-pl a").on('click',function(e){
 	      window.current_pld.clickEvent(e);
-	    });
+		});
 	}
+
 	
     this.clickEvent = function(e){
       var i = $(e.target).closest("tr").attr("id");
 	  $(e.target).closest("tr").remove();
       var clicked = window.current_pld.rids[i];
       this.pl.remove(clicked);
-	  this.plremove(clicked);
+	  this.dbremove(clicked);
 	  console.log(clicked);	  
   }
   
-  this.plremove=function(song){
-	  console.log("im in plremove");
+  this.dbremove=function(song){
+	  console.log("im in dbremove");
 	  console.log(song.orderi);
 	  ajax_delete("/api/playlist/"+this.pl.plid+"/song", "song_id="+song.resourceid+"&orderi="+song.orderi, songremoved)
   }
