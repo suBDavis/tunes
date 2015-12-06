@@ -95,6 +95,7 @@ class SQL:
         #JS playlist id == 0 --> just created, doesn't exist yet
         #print (plid)
         print("in add to pl")
+        orderi=1
         if plid == '0':
             #sql = "SELECT UUID()"
             #params=None
@@ -108,22 +109,23 @@ class SQL:
             #params = ('rainy weather',)
             result = self.query(sql, params)
             #print(result)
-            orderi=1
-        else :
+        else:
             sql= "SELECT MAX(orderi) FROM relation WHERE plid=%s"
             params=(plid)
             result = self.query(sql, params)
             print (result)
             
             #ok now get the max orderi out of the result in the worst possible way possible
+            
             res=str(result[0])
             print(res)
             i=len(res)-17;
             print(i)
             res=res[16:(16+i)]
             print(res)
-            orderi=int(float(res))+1
-            print(orderi)
+            if (res != "None"):
+                orderi=int(float(res))+1
+                print(orderi)
             #print(res)
             
         sql = "INSERT INTO relation (plid, rid, songtype, title, artist, orderi) VALUES (%s, %s, %s, %s, %s, %s)"
