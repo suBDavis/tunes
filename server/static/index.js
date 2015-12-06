@@ -113,11 +113,13 @@ var current_pl = function(){
 	  $(e.target).closest("tr").remove();
       var clicked = window.current_pld.rids[i];
       this.pl.remove(clicked);
-	  this.plremove(clicked);	  
+	  this.plremove(clicked);
+	  console.log(clicked);	  
   }
   
   this.plremove=function(song){
 	  console.log("im in plremove");
+	  console.log(song.orderi);
 	  ajax_delete("/api/playlist/"+this.pl.plid+"/song", "song_id="+song.resourceid+"&orderi="+song.orderi, songremoved)
   }
   
