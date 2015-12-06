@@ -93,32 +93,55 @@ class SQL:
         #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
         
         #JS playlist id == 0 --> just created, doesn't exist yet
-        print (plid)
+        #print (plid)
+        print("in add to pl")
         if plid == '0':
             #sql = "SELECT UUID()"
             #params=None
             #result = self.query(sql, params)
             #plid = result[0]
             plid = self.id_generator()   #TODO: check if this has been used before
-            print (plid)
+            #print (plid)
             sql = "INSERT INTO playlists (plid, name) VALUES (%s, %s)"
             params = (plid, 'New Playlist') 
             #sql = "select guid from sp_playlists where name=%s"
             #params = ('rainy weather',)
             result = self.query(sql, params)
-            print(result)
+            #print(result)
+            orderi=1
+        else :
+            sql= "SELECT MAX(orderi) FROM relation WHERE plid=%s"
+            params=(plid)
+            result = self.query(sql, params)
+            print (result)
             
-        sql = "INSERT INTO relation (plid, rid, songtype, title, artist) VALUES (%s, %s, %s, %s, %s)"
-        params = (plid, resourceID, songtype, title, artist)
+            #ok now get the max orderi out of the result in the worst possible way possible
+            res=str(result[0])
+            print(res)
+            i=len(res)-17;
+            print(i)
+            res=res[16:(16+i)]
+            print(res)
+            orderi=int(float(res))+1
+            print(orderi)
+            #print(res)
+            
+        sql = "INSERT INTO relation (plid, rid, songtype, title, artist, orderi) VALUES (%s, %s, %s, %s, %s, %s)"
+        params = (plid, resourceID, songtype, title, artist, orderi)
         result = self.query(sql, params)
-        return {'plid' : plid} 
+        return {'plid' : plid, 'orderi' : orderi} 
 
 
-    def removeFromPL(self, songid, plid):
+    def removeFromPL(self, songid, orderi, plid):
+        
+        sql = "DELETE FROM relation WHERE plid=%s AND rid=%s AND orderi=%s"
+        params = (plid, songid, orderi)
+        result = self.query(sql, params)
+        #TODO: handle error when song not found
         #if a remove happens, then the song must already have been in the db.  
         #if the song was already in the db, we can referr to it by the db it (guid from sp_songs)
         #if either songid or plid are not found, return a new internal error.
-        pass
+        return self.checkReturn(result, "pl_remove_result")
 
     def getPL(self, plid):
         sql="SELECT * FROM relation WHERE plid=%s"
@@ -133,7 +156,7 @@ class SQL:
                 c.execute(query, params)
                 self.connection.commit()    #commit the changes to db or they wont happen. srsly wtf this took me 30 min to find because literally who makes changes to a database and doesnt want them to stay there??????? ok tbh i guess i can think of a bunch of reasons but im still bitter 
                 res = c.fetchall()
-                print(params)
+                #print(params)
                 #print (res)
                 return res 
         except:

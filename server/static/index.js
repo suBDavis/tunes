@@ -16,6 +16,11 @@ function song(songtype, songid, resourceid, artist, songtitle){
   this.resourceid = resourceid; //either the youtube id or the souncloud resource id.
   this.artist = artist;
   this.songtitle = songtitle;
+  this.orderi;
+  
+  this.setorderi=function(orderi){
+	  this.orderi=orderi;
+  }
 }
 
 //-------------------------------------------
@@ -80,12 +85,14 @@ var current_pl = function(){
 		}
 	}
 	
-	var plreturn=function(plid){
-		plid = JSON.parse(plid);
-		console.log(plid);
-		plid = plid['plid'];
+	var plreturn=function(res){
+		res = JSON.parse(res);
+		console.log(res);
+		var plid = res['plid'];
+		var orderi = res['orderi'];
 		console.log(plid);
 		window.current_pld.pl.setplid(plid);
+		window.current_pld.pl.setlastorder(orderi);
 		window.current_pld.divid.empty();
 		window.current_pld.divid.append("Current Playlist ID: "+plid);
 	}
@@ -109,12 +116,13 @@ var current_pl = function(){
 	  this.plremove(clicked);	  
   }
   
-  //this.plremove(song){
-  //	ajax_delete("api/playlist/"+this.pl.plid+"/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, songremoved)
-	  //}
+  this.plremove=function(song){
+	  console.log("im in plremove");
+	  ajax_delete("/api/playlist/"+this.pl.plid+"/song", "song_id="+song.resourceid+"&orderi="+song.orderi, songremoved)
+  }
   
-  //var songremoved = function(){
-	  //}
+  var songremoved = function(){
+  }
 };
 
 function ajax_delete(url, deleteinfo, callback) { 

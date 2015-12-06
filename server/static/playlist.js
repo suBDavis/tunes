@@ -20,7 +20,7 @@ var playlist = function(){
     }
 	this.remove = function(song){ 
 		for (var i=0;i<this.plist.length;i++){ //lol sorry i know there is a better way to do this i just dont know what it is rn
-			if (this.plist[i].resourceid===song.resourceid){ 
+			if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi==song.orderi){ 
 				this.plist.splice(i, 1);
 			}
 		}
@@ -35,6 +35,10 @@ var playlist = function(){
 		this.plist=[];
 		this.pointer=0;
 		this.plid=plid;
+	}
+	
+	this.setlastorder = function(orderi){
+		(this.plist[this.plist.length-1]).setorderi(orderi);
 	}
 	
 };
