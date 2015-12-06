@@ -78,7 +78,7 @@ var current_pl = function(){
 			window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
 			for (var i=0; i < res.pl_result.length; i++){
 				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title']);
-				window.current_pld.addSong(s);
+				window.current_pld.addSongNodeOnly(s);
 			}
 			//window.current_pld.pl.empty();
 			//window.current_pld.pl.setplid(window.current_pld.pl.subplid);
@@ -106,8 +106,18 @@ var current_pl = function(){
 	      window.current_pld.clickEvent(e);
 	    });
 		ajax_post("/api/playlist/"+this.pl.plid + "/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, plreturn);
-	
 	}
+	
+	this.addSongNodeOnly = function(song){
+		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		this.divtb.append(newnode);
+		this.pl.append(song);
+		this.rids[song.resourceid] = song;
+	    $("#current-pl a").on('click',function(e){
+	      window.current_pld.clickEvent(e);
+	    });
+	}
+	
     this.clickEvent = function(e){
       var i = $(e.target).closest("tr").attr("id");
 	  $(e.target).closest("tr").remove();

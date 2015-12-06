@@ -94,7 +94,7 @@ class SQL:
         
         #JS playlist id == 0 --> just created, doesn't exist yet
         #print (plid)
-        print("in add to pl")
+        #print("in add to pl")
         orderi=1
         if plid == '0':
             #sql = "SELECT UUID()"
@@ -118,11 +118,11 @@ class SQL:
             #ok now get the max orderi out of the result in the worst possible way possible
             
             res=str(result[0])
-            print(res)
+            #print(res)
             i=len(res)-17;
-            print(i)
+            #print(i)
             res=res[16:(16+i)]
-            print(res)
+            #print(res)
             if (res != "None"):
                 orderi=int(float(res))+1
                 print(orderi)
