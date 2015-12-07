@@ -36,6 +36,16 @@
                                     <tr><td>No results</td></tr>
                                 </table>
                             </div>
+							<div id = "current-pl">
+								<h4 id="plid">Current Playlist</h4>
+								<form id="current-pl-form">
+									<label>
+										Load Playlist ID: 
+										<input id="current-pl-input" type="text" name="playlist-id-in">
+									</label>
+									<table id="current-pl-tb">
+									</table>
+							</div>
                         </div>
                     </div>
                 </div>
@@ -50,7 +60,7 @@
     <script type='text/javascript' src="{{ url_for('static',filename='jquery.min.js')}}"></script>
     <script type='text/javascript' src="https://connect.soundcloud.com/sdk/sdk-3.0.0.js"></script>
     <!--<script type='text/javascript' src="{{ url_for('static',filename='semantic/semantic.min.js')}}"></script>-->
-    <!--<script type='text/javascript' src="{{ url_for('static',filename='soundcloud_player_api.js')}}"></script>  -->
+    <script type='text/javascript' src="{{ url_for('static',filename='soundcloud_player_api.js')}}"></script>  
     <script type='text/javascript' src="{{ url_for('static',filename='playlist.js')}}"></script>
     <script type='text/javascript' src="{{ url_for('static',filename='ytplayer.js')}}"></script>
     <script type='text/javascript' src="{{ url_for('static',filename='index.js')}}"></script>

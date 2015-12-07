@@ -4,7 +4,8 @@ import pymysql.cursors
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 from oauth2client.tools import argparser
-
+import string
+import random
 
 class Config:
 
@@ -12,7 +13,7 @@ class Config:
         #Load config into memory and print version
         fdiv = "/"
         if os.name == "nt":
-            # change based on OS - Windows is "nt"? WTF
+            # change based on OS - Windows is "nt"? WTF 
             fdiv = "\\"
         basepath = os.path.dirname(os.path.abspath(__file__)) #this works on any OS now
         with open(basepath + fdiv + 'config.json') as config_file:
@@ -73,7 +74,12 @@ class SQL:
     
     #this section manages playlist stuff
 
-    def addToPL(self, type, resourceID, title, artist, plid):
+
+    def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+        
+    def addToPL(self, songtype, resourceID, title, artist, plid):
+        
         #we will pass it this for every insert.  
         #type:  sc - soundcloud
         #       yt - youtube
@@ -85,24 +91,75 @@ class SQL:
         #Let's put out user-created playlists into a new table called "playlists"
         #   reason being, the sp_playlists table is just too damn big and we don't want to corrupt or screw it up.
         #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
-        pass
+        
+        #JS playlist id == 0 --> just created, doesn't exist yet
+        #print (plid)
+        #print("in add to pl")
+        orderi=1
+        if plid == '0':
+            #sql = "SELECT UUID()"
+            #params=None
+            #result = self.query(sql, params)
+            #plid = result[0]
+            plid = self.id_generator()   #TODO: check if this has been used before
+            #print (plid)
+            sql = "INSERT INTO playlists (plid, name) VALUES (%s, %s)"
+            params = (plid, 'New Playlist') 
+            #sql = "select guid from sp_playlists where name=%s"
+            #params = ('rainy weather',)
+            result = self.query(sql, params)
+            #print(result)
+        else:
+            sql= "SELECT MAX(orderi) FROM relation WHERE plid=%s"
+            params=(plid)
+            result = self.query(sql, params)
+            print (result)
+            
+            #ok now get the max orderi out of the result in the worst possible way possible
+            
+            res=str(result[0])
+            #print(res)
+            i=len(res)-17;
+            #print(i)
+            res=res[16:(16+i)]
+            #print(res)
+            if (res != "None"):
+                orderi=int(float(res))+1
+                print(orderi)
+            #print(res)
+            
+        sql = "INSERT INTO relation (plid, rid, songtype, title, artist, orderi) VALUES (%s, %s, %s, %s, %s, %s)"
+        params = (plid, resourceID, songtype, title, artist, orderi)
+        result = self.query(sql, params)
+        return {'plid' : plid, 'orderi' : orderi} 
 
-    def removeFromPL(self, songid, plid):
+
+    def removeFromPL(self, songid, orderi, plid):
+        
+        sql = "DELETE FROM relation WHERE plid=%s AND rid=%s AND orderi=%s"
+        params = (plid, songid, orderi)
+        result = self.query(sql, params)
+        #TODO: handle error when song not found
         #if a remove happens, then the song must already have been in the db.  
         #if the song was already in the db, we can referr to it by the db it (guid from sp_songs)
         #if either songid or plid are not found, return a new internal error.
-        pass
+        return self.checkReturn(result, "pl_remove_result")
 
     def getPL(self, plid):
-        pass
+        sql="SELECT * FROM relation WHERE plid=%s"
+        params=(plid)
+        result = self.query(sql,params)
+        return(self.checkReturn(result, "pl_result"))
 
     #This runs the query against the server.        
     def query(self, query, params):
         try:
             with self.connection.cursor() as c:
                 c.execute(query, params)
+                self.connection.commit()    #commit the changes to db or they wont happen. srsly wtf this took me 30 min to find because literally who makes changes to a database and doesnt want them to stay there??????? ok tbh i guess i can think of a bunch of reasons but im still bitter 
                 res = c.fetchall()
                 #print(params)
+                #print (res)
                 return res 
         except:
             return self.error()

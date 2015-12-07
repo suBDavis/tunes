@@ -17,25 +17,167 @@ function song(songtype, songid, resourceid, artist, songtitle){
   this.artist = artist;
   this.songtitle = songtitle;
   this.sc_url; //this param is only for soundcloud because soundcloud API is very poorly designed and I can't get this with an ID
+  this.orderi;
+  
+  this.setorderi=function(orderi){
+	  this.orderi=orderi;
+  }
 }
 
 //-------------------------------------------
 // This is what happens when someone click's the + button next to a search result.
 //-------------------------------------------
 function onAdd(song_meta){
+	
   //this is a song object (from above) - it has all the properties listed
   //it might not have a songid.  If it doesn't, this means the song is not in our database yet (it came from yt or sc)
   //basically the  youtube and soundcloud players will need to have access to a universal playlist (pl_manager currently)
   //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
-
-  console.log(song_meta);//here's whats inside.
-
-  // playlist.append(song_meta);
+  //console.log(song_meta);//here's whats inside.
+  //console.log(";)");
+  
+   current_pld.addSong(song_meta);
+   //playlist.append(song_meta);
+   
 
   // the playlist object is in playlist.js (same folder)
   // the youtube player is in ytplayer.js
 
 }
+
+var current_pl = function(){
+	this.div=$("#current-pl");
+	this.divtb = $("#current-pl-tb");
+	this.divid = $("#plid");
+	//this.tbdiv = $("#current-pl-td")
+	this.maxchars = 60;
+	this.pl = new playlist();
+	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
+	this.rids = {};
+	this.subplid = 0;
+	this.enter_pl = $("#current-pl-form");
+	
+	this.enter_pl.submit(function (e) {
+		e.preventDefault();
+		window.current_pld.loadplrequest(e);
+	});
+	
+	this.loadplrequest=function(e){
+		console.log("submit pl id");
+		this.subplid = $("#current-pl-input").val()
+		console.log(this.subplid);
+		ajax("/api/playlist/"+this.subplid,loadpl)
+	}
+	
+	var loadpl=function(res){
+		console.log(res);
+		res=JSON.parse(res);
+		if (res.pl_result.length > 0){ //TODO: handle when they enter a nonexistent pl
+			window.current_pld.divtb.empty();
+			window.current_pld.pl.new(window.current_pld.subplid);
+			window.current_pld.divid.empty();
+			window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
+			for (var i=0; i < res.pl_result.length; i++){
+				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title']);
+				window.current_pld.addSongNodeOnly(s);
+			}
+			//window.current_pld.pl.empty();
+			//window.current_pld.pl.setplid(window.current_pld.pl.subplid);
+		}
+	}
+	
+	var plreturn=function(res){
+		res = JSON.parse(res);
+		console.log(res);
+		var plid = res['plid'];
+		var orderi = res['orderi'];
+		console.log(plid);
+		window.current_pld.pl.setplid(plid);
+		window.current_pld.pl.setlastorder(orderi);
+		window.current_pld.divid.empty();
+		window.current_pld.divid.append("Current Playlist ID: "+plid);
+	}
+	
+	this.addSong = function(song){
+		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		this.divtb.append(newnode);
+		this.pl.append(song);
+		this.rids[song.resourceid] = song;
+	    $("#current-pl a").on('click',function(e){
+	      window.current_pld.clickEvent(e);
+	    });
+		ajax_post("/api/playlist/"+this.pl.plid + "/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, plreturn);
+	}
+	
+	this.addSongNodeOnly = function(song){
+		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		this.divtb.append(newnode);
+		this.pl.append(song);
+		this.rids[song.resourceid] = song;
+	    $("#current-pl a").on('click',function(e){
+	      window.current_pld.clickEvent(e);
+	    });
+	}
+	
+    this.clickEvent = function(e){
+      var i = $(e.target).closest("tr").attr("id");
+	  $(e.target).closest("tr").remove();
+      var clicked = window.current_pld.rids[i];
+      this.pl.remove(clicked);
+	  this.plremove(clicked);
+	  console.log(clicked);	  
+  }
+  
+  this.plremove=function(song){
+	  console.log("im in plremove");
+	  console.log(song.orderi);
+	  ajax_delete("/api/playlist/"+this.pl.plid+"/song", "song_id="+song.resourceid+"&orderi="+song.orderi, songremoved)
+  }
+  
+  var songremoved = function(){
+  }
+};
+
+function ajax_delete(url, deleteinfo, callback) { 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+     //console.log("workd" + xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      ajax("/api/mysql" , function(){
+        ajax(url, callback);
+      });
+     } else {
+      callback(xhttp.responseText);
+     }
+    }
+  };
+  xhttp.open("DELETE", baseurl + url, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send(deleteinfo);
+}
+
+function ajax_post(url, postinfo, callback) { 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+     //console.log("workd" + xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      ajax("/api/mysql" , function(){
+        ajax(url, callback);
+      });
+     } else {
+      callback(xhttp.responseText);
+     }
+    }
+  };
+  xhttp.open("POST", baseurl + url, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send(postinfo);
+}
+
 
 //------------------------------------------
 // Ajax requests can use this helper method.  Pass it a callback for what you want it to do with your results
@@ -63,25 +205,31 @@ function ajax(url, callback) {
 //here's the entry point for the JS file
 //---------------------------------------
 function initialize(){
-    window.top_searchbar = new searchbar("search-ajax");
-    window.searchr = new results("search-results-table"); 
-    //pl_manager was already initialized
-   
-    //register listener for search box.
-    $("#search").on('input', function(){ updateSearch(); });
-    $("#search-ajax").on('click', function(e){ generateResults(e); });
-   
-    //Let's create a soundcloud API connection
-    SC.initialize({
-      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
-    });
+  window.top_searchbar = new searchbar("search-ajax");
+  window.searchr = new results("search-results-table"); 
+	window.current_pld = new current_pl("current-pl");
+	//window.current_pl = new pl_div();
+  pl_manager = new playlist();
+ 
+  //register listener for search box.
+  $("#search").on('input', function(){ updateSearch(); });
+  $("#search-ajax").on('click', function(e){ generateResults(e); });
+ 
+  //Let's create a soundcloud API connection
+  SC.initialize({
+    client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
+  });
 
-    //initializeSCPlayer();
+  initializeSCPlayer();
 }
 
 //========================================
 // WARNING: Spaghetti code below this line!
 //========================================
+
+function current_pl(){
+	this.pl_div = $("<div>Playlist</div>");
+}
 
 function updateSearch(){
   //empty the list
@@ -243,6 +391,8 @@ function searchbar(tagid){
 //clicking outside search should close search bar
 //I haven't done that yet.
 
+
+
 function results(tagid){
   this.div = $("#search-results-table");
   this.tagid = tagid;
@@ -254,7 +404,7 @@ function results(tagid){
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
-
+  
   this.addItem = function(dict_item, type){
     //console.log(dict_item);
     if (type == "sc"){
