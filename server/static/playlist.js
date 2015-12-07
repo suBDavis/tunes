@@ -7,17 +7,31 @@ var playlist = function(){
         //return the next song and increment the playlist pointer
         return this.plist[this.pointer++];
     }
+	
+	this.getCurrent = function() { 
+		return this.plist[this.pointer]; 
+		this.pointer++; 
+	}
+	
     this.append = function(song){
         //push to the end of the array list
         //song should be one of the source-agnostic song objects from index.js probably.
         this.plist.push(song);
 
-        if(this.plist.length == 1){
+        if(this.plist.length >= 1){
             //we added the first song.  Let the playing begin!
             ytLoadSong(this.plist[this.pointer]);
             this.pointer++;
         }
     }
+	
+	this.appendYTRID = function(resID) {
+		this.plist.push(resID); 
+		if (this.plist.length >= 1) { 
+			ytCuePlaylist(this.plist); 
+		}
+	}
+	
 	this.remove = function(song){ 
 		console.log("in playlist");
 		console.log(this.plist);

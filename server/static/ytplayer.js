@@ -13,7 +13,10 @@ function onYouTubeIframeAPIReady() {
   player = new YT.Player('player', {
     height: '390',
     width: '640',
-    videoId: pl_manager.getNext(), //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
+	videoID: currentYTSongsRIDs.getCurrent(), 
+	//videoId: currentYTSongs.getNext(),
+	  //pl_manager.getNext(),
+	  //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
     events: {
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange
@@ -25,7 +28,7 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
   //I'll deal with this later.
-  //event.target.playVideo();
+  event.target.playVideo();
   //pl_manager.append("string");
 }
 
@@ -46,6 +49,15 @@ function stopVideo() {
   player.stopVideo();
 }
 
-function ytLoadSong(songid){
-  player.loadVideoById({'videoId': songid});
+function ytCueSong(resourceid) {
+  player.cueVideoById({'videoId': resourceid});
 }
+
+function ytLoadSong(resourceid) {
+  player.loadVideoById({'videoId' : resourceid}); 
+}
+
+function ytCuePlaylist(plist){
+	player.cuePlaylist({'playlist' : plist}); 
+}
+
