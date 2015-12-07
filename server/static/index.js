@@ -6,22 +6,22 @@
 
 // this is set from initialize() where we instantiate the playlist.js playlist object
 var pl_manager = null; 
+var currentYTSongs = null;
+var currentYTSongsRIDs = null; 
 
 //-------------------------------------------
 // Song object that is ambuguous to source 
 //-------------------------------------------
-function song(songtype, songid, resourceid, artist, songtitle){
+function song(songtype, songid, resourceid, artist, songtitle,orderi){
   this.songtype = songtype;
   this.songid = songid;
   this.resourceid = resourceid; //either the youtube id or the souncloud resource id.
   this.artist = artist;
   this.songtitle = songtitle;
   this.sc_url; //this param is only for soundcloud because soundcloud API is very poorly designed and I can't get this with an ID
-  this.orderi;
+  this.orderi = orderi;
   
-  this.setorderi=function(orderi){
-	  this.orderi=orderi;
-  }
+  console.log("Title: "+songtitle+" orderi: "+orderi);
 }
 
 //-------------------------------------------
@@ -52,20 +52,28 @@ var current_pl = function(){
 	//this.tbdiv = $("#current-pl-td")
 	this.maxchars = 60;
 	this.pl = new playlist();
-	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
+	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>-</i></a>";
+	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>></i></a>";
 	this.rids = {};
+	this.ytSongs = new playlist(); 
+	this.ytRIDs = new playlist();
+	this.ytRIDptr = 0; 
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
+	this.lastorderi;
+	this.lastsong;
 	
 	this.enter_pl.submit(function (e) {
 		e.preventDefault();
+		console.log("subplid is in enter_pl: "+this.subplid);
+		window.current_pld.subplid = $("#current-pl-input").val();
 		window.current_pld.loadplrequest(e);
 	});
 	
 	this.loadplrequest=function(e){
+		//this.subplid = $("#current-pl-input").val()
 		console.log("submit pl id");
-		this.subplid = $("#current-pl-input").val()
-		console.log(this.subplid);
+		console.log("subplid is: "+this.subplid);
 		ajax("/api/playlist/"+this.subplid,loadpl)
 	}
 	
@@ -78,7 +86,8 @@ var current_pl = function(){
 			window.current_pld.divid.empty();
 			window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
 			for (var i=0; i < res.pl_result.length; i++){
-				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title']);
+				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title'],res.pl_result[i]['orderi']);
+				console.log(s.orderi)
 				window.current_pld.addSongNodeOnly(s);
 			}
 			//window.current_pld.pl.empty();
@@ -88,48 +97,97 @@ var current_pl = function(){
 	
 	var plreturn=function(res){
 		res = JSON.parse(res);
-		console.log(res);
+		//console.log(res);
 		var plid = res['plid'];
 		var orderi = res['orderi'];
-		console.log(plid);
+		//console.log(plid);
+		//console.log(orderi);
 		window.current_pld.pl.setplid(plid);
-		window.current_pld.pl.setlastorder(orderi);
+		window.current_pld.lastorderi=orderi;
 		window.current_pld.divid.empty();
 		window.current_pld.divid.append("Current Playlist ID: "+plid);
+		window.current_pld.addSongOrderi(orderi);
 	}
 	
 	this.addSong = function(song){
-		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
-		this.divtb.append(newnode);
-		this.pl.append(song);
-		this.rids[song.resourceid] = song;
-	    $("#current-pl a").on('click',function(e){
-	      window.current_pld.clickEvent(e);
-	    });
+		this.lastsong = song;
 		ajax_post("/api/playlist/"+this.pl.plid + "/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, plreturn);
+		
+		//song.orderi = this.lastorderi;
+		//console.log("song orderi is: ");
+		//console.log(song.orderi);
+		//console.log("Song in addSong is:");
+		//console.log(song);
+		//var newnode = "<tr id='"+song.orderid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		//this.divtb.append(newnode);
+		//this.pl.append(song);
+		//this.rids[song.orderi] = song;
+	    //$("#current-pl a").off().on('click',function(e){
+	    //  window.current_pld.clickEvent(e);
+		//});
+		//console.log(song);
+		//console.log(this.rids);
+	}
+	
+	this.addSongOrderi=function(orderi){
+		var s = new song(this.lastsong.songtype, this.lastsong.songid, this.lastsong.resourceid, this.lastsong.artist, this.lastsong.songtitle, orderi)
+		var newnode = "<tr id='"+s.orderi+"'><td class='a'>" + s.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + s.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		this.divtb.append(newnode);
+		this.pl.append(s);
+		this.rids[s.orderi] = s;
+		if (s.songtype == "youtube") {
+			this.ytSongs.append(s);
+			console.log("added to yt");
+			this.ytRIDs.appendYTRID(s.resourceid); 
+			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
+			console.log(this.ytRIDs.plist[this.ytRIDptr]);
+			this.ytRIDptr++; 
+			console.log("added to ytrids"); 
+		}
+	    $("#current-pl a").off().on('click',function(e){
+	      window.current_pld.clickEvent(e);
+		});
+		console.log(s);
+		console.log(this.rids);
 	}
 	
 	this.addSongNodeOnly = function(song){
-		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+	var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
+	 + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(song);
-		this.rids[song.resourceid] = song;
-	    $("#current-pl a").on('click',function(e){
+		this.rids[song.orderi] = song;
+		if (song.songtype == "youtube") {
+			this.ytSongs.append(song);
+			console.log("added to yt");
+			this.ytRIDs.appendYTRID(song.resourceid); 
+			//this.ytRIDs.appendYTRID(this.ytRIDptr); 
+			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
+			console.log(this.ytRIDs.plist[this.ytRIDptr]); 
+			this.ytRIDptr++; 
+			console.log("added to ytrids"); 
+		//	console.log(this.ytRIDs[this.ytRIDptr--]); 
+			
+		}
+	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
-	    });
+		});
 	}
 	
     this.clickEvent = function(e){
       var i = $(e.target).closest("tr").attr("id");
 	  $(e.target).closest("tr").remove();
       var clicked = window.current_pld.rids[i];
+	  console.log("clicked");
+	  console.log(i);
+	  console.log(clicked);
       this.pl.remove(clicked);
-	  this.plremove(clicked);
+	  this.dbremove(clicked);
 	  console.log(clicked);	  
   }
   
-  this.plremove=function(song){
-	  console.log("im in plremove");
+  this.dbremove=function(song){
+	  console.log("im in dbremove with song order:");
 	  console.log(song.orderi);
 	  ajax_delete("/api/playlist/"+this.pl.plid+"/song", "song_id="+song.resourceid+"&orderi="+song.orderi, songremoved)
   }
@@ -210,17 +268,24 @@ function initialize(){
 	window.current_pld = new current_pl("current-pl");
 	//window.current_pl = new pl_div();
   pl_manager = new playlist();
- 
-  //register listener for search box.
-  $("#search").on('input', function(){ updateSearch(); });
-  $("#search-ajax").on('click', function(e){ generateResults(e); });
- 
-  //Let's create a soundcloud API connection
-  SC.initialize({
-    client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
-  });
+	currentYTSongs = current_pld.ytSongs;
+	currentYTSongsRIDs = current_pld.ytRIDs;
+   
+   
+    //register listener for search box.
+    $("#search").on('input', function(){ updateSearch(); });
+    $("#search-ajax").on('click', function(e){ generateResults(e); });
+   
+    //Let's create a soundcloud API connection
+    SC.initialize({
+      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
+    });
+//	updatepl();	
+}
 
-  initializeSCPlayer();
+function updatepl() {
+	window.current_pld.loadplrequest();
+	setTimeout(updatepl, 500);
 }
 
 //========================================

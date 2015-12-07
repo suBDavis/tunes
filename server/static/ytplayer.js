@@ -11,10 +11,16 @@ var ytplayer;
 var pl_manager = new playlist();
 
 function onYouTubeIframeAPIReady() {
-  ytplayer = new YT.Player('player', {
+  //TODO : make this universal
+  player = new YT.Player('player', {
     height: '390',
     width: '640',
-    videoId: null, //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
+
+	videoID: currentYTSongsRIDs.getCurrent(), 
+	//videoId: currentYTSongs.getNext(),
+	  //pl_manager.getNext(),
+	  //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
+
     events: {
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange
@@ -25,7 +31,7 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
   //I'll deal with this later.
-  //event.target.playVideo();
+  event.target.playVideo();
   //pl_manager.append("string");
 }
 // 5. The API calls this function when the player's state changes.
@@ -42,6 +48,7 @@ function onPlayerStateChange(event) {
 function stopVideo() {
   ytplayer.stopVideo();
 }
+
 function ytLoadSong(songid){
   ytplayer.loadVideoById({'videoId': songid});
 }
@@ -64,7 +71,7 @@ function scLoadSong(id){
 // ====================================
 // ......always use this.
 
-var player;
+// var player;
 
 function initializePlayer(){
   //get soundcloud ready
@@ -101,3 +108,16 @@ function uniPlayer(youtube, soundcloud){
     //what to do if a user clicks play on a particular song in the PL
   }
 }
+
+function ytCueSong(resourceid) {
+  player.cueVideoById({'videoId': resourceid});
+}
+
+function ytLoadSong(resourceid) {
+  player.loadVideoById({'videoId' : resourceid}); 
+}
+
+function ytCuePlaylist(plist){
+	player.cuePlaylist({'playlist' : plist}); 
+}
+

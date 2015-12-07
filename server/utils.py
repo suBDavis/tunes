@@ -113,7 +113,7 @@ class SQL:
             sql= "SELECT MAX(orderi) FROM relation WHERE plid=%s"
             params=(plid)
             result = self.query(sql, params)
-            print (result)
+            #print (result)
             
             #ok now get the max orderi out of the result in the worst possible way possible
             
@@ -125,7 +125,7 @@ class SQL:
             #print(res)
             if (res != "None"):
                 orderi=int(float(res))+1
-                print(orderi)
+                #print(orderi)
             #print(res)
             
         sql = "INSERT INTO relation (plid, rid, songtype, title, artist, orderi) VALUES (%s, %s, %s, %s, %s, %s)"
@@ -135,7 +135,7 @@ class SQL:
 
 
     def removeFromPL(self, songid, orderi, plid):
-        
+        print(orderi)
         sql = "DELETE FROM relation WHERE plid=%s AND rid=%s AND orderi=%s"
         params = (plid, songid, orderi)
         result = self.query(sql, params)
