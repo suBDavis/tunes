@@ -15,8 +15,7 @@ function onYouTubeIframeAPIReady() {
   ytplayer = new YT.Player('player', {
     height: '390',
     width: '640',
-
-	videoID: current_pld.ytSongs.getCurrent(), 
+	videoID: current_pld.ytRIDs[ytRIDptr],
 	//videoId: currentYTSongs.getNext(),
 	  //pl_manager.getNext(),
 	  //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
@@ -44,9 +43,9 @@ function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.ENDED) {
 	 // console.log(currentYTSongsRIDs.getCurrent()); 
 	 // console.log(currentYTSongsRIDs.getNext());
-   var nextSongId = current_pld.ytSongs.getNext().songid;
+	 var nextSongRID = current_pld.ytRIDs[ytRIDptr];
    console.log(nextSongId); 
-	  ytLoadSong(nextSongId); 
+   ytLoadSong(nextSongId); 
   }
 }
 function stopVideo() {
@@ -58,7 +57,7 @@ function ytLoadSong(resourceid){
 }
 
 function ytCuePlaylist(plist){
-	ytplayer.cuePlaylist({'playlist' : plist}); 
+  ytplayer.cuePlaylist({'playlist' : plist}); 
 }
 
 // ====================================

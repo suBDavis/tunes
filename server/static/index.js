@@ -8,6 +8,7 @@
 var pl_manager = null; 
 var currentYTSongs = null;
 var currentYTSongsRIDs = null; 
+var ytRIDptr = 0; 
 
 //-------------------------------------------
 // Song object that is ambuguous to source 
@@ -57,7 +58,7 @@ var current_pl = function(){
 	this.rids = {};
 	this.ytSongs = new playlist(); 
 	this.ytRIDs = new playlist();
-	this.ytRIDptr = 0; 
+	//this.ytRIDptr = 0; 
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
 	this.lastorderi;
@@ -137,11 +138,13 @@ var current_pl = function(){
 		this.rids[s.orderi] = s;
 		if (s.songtype == "youtube") {
 			this.ytSongs.append(s);
+			console.log(ytRIDptr); 
 			console.log("added to yt");
 			this.ytRIDs.appendYTRID(s.resourceid); 
 			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
-			console.log(this.ytRIDs.plist[this.ytRIDptr]);
-			this.ytRIDptr++; 
+			console.log(this.ytRIDs.plist[ytRIDptr]);
+			ytRIDptr++; 
+			console.log(ytRIDptr);
 			console.log("added to ytrids"); 
 		}
 	    $("#current-pl a").off().on('click',function(e){
@@ -163,8 +166,8 @@ var current_pl = function(){
 			this.ytRIDs.appendYTRID(song.resourceid); 
 			//this.ytRIDs.appendYTRID(this.ytRIDptr); 
 			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
-			console.log(this.ytRIDs.plist[this.ytRIDptr]); 
-			this.ytRIDptr++; 
+			console.log(this.ytRIDs.plist[ytRIDptr]); 
+			ytRIDptr++; 
 			console.log("added to ytrids"); 
 		//	console.log(this.ytRIDs[this.ytRIDptr--]); 
 			
@@ -270,7 +273,6 @@ function initialize(){
   pl_manager = new playlist();
 	currentYTSongs = current_pld.ytSongs;
 	currentYTSongsRIDs = current_pld.ytRIDs;
-   
    
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
