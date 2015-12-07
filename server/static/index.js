@@ -73,8 +73,8 @@ var current_pl = function(){
 	
 	this.loadplrequest=function(e){
 		//this.subplid = $("#current-pl-input").val()
-		console.log("submit pl id");
-		console.log("subplid is: "+this.subplid);
+		//console.log("submit pl id");
+		//console.log("subplid is: "+this.subplid);
 		ajax("/api/playlist/"+this.subplid,loadpl)
 	}
 	
@@ -88,7 +88,7 @@ var current_pl = function(){
 			window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
 			for (var i=0; i < res.pl_result.length; i++){
 				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title'],res.pl_result[i]['orderi']);
-				console.log(s.orderi)
+				//console.log(s.orderi)
 				window.current_pld.addSongNodeOnly(s);
 			}
 			//window.current_pld.pl.empty();
@@ -155,7 +155,7 @@ var current_pl = function(){
 	}
 	
 	this.addSongNodeOnly = function(song){
-	var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
+	var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
 	 + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(song);
@@ -282,12 +282,12 @@ function initialize(){
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
-//	updatepl();	
+	//updatepl();	
 }
 
 function updatepl() {
 	window.current_pld.loadplrequest();
-	setTimeout(updatepl, 500);
+	setTimeout(updatepl, 1000);
 }
 
 //========================================
