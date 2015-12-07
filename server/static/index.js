@@ -6,6 +6,8 @@ var baseurl = "http://localhost:5000"
 
 // this is set from initialize() where we instantiate the playlist.js playlist object
 var pl_manager = null; 
+var currentYTSongs = null;
+var currentYTSongsRIDs = null; 
 
 //-------------------------------------------
 // Song object that is ambuguous to source 
@@ -49,8 +51,12 @@ var current_pl = function(){
 	//this.tbdiv = $("#current-pl-td")
 	this.maxchars = 60;
 	this.pl = new playlist();
-	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
+	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>-</i></a>";
+	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>></i></a>";
 	this.rids = {};
+	this.ytSongs = new playlist(); 
+	this.ytRIDs = new playlist();
+	this.ytRIDptr = 0; 
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
 	this.lastorderi;
@@ -126,6 +132,15 @@ var current_pl = function(){
 		this.divtb.append(newnode);
 		this.pl.append(s);
 		this.rids[s.orderi] = s;
+		if (s.songtype == "youtube") {
+			this.ytSongs.append(s);
+			console.log("added to yt");
+			this.ytRIDs.appendYTRID(s.resourceid); 
+			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
+			console.log(this.ytRIDs.plist[this.ytRIDptr]);
+			this.ytRIDptr++; 
+			console.log("added to ytrids"); 
+		}
 	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
@@ -134,15 +149,27 @@ var current_pl = function(){
 	}
 	
 	this.addSongNodeOnly = function(song){
-		var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+	var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
+	 + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(song);
 		this.rids[song.orderi] = song;
+		if (song.songtype == "youtube") {
+			this.ytSongs.append(song);
+			console.log("added to yt");
+			this.ytRIDs.appendYTRID(song.resourceid); 
+			//this.ytRIDs.appendYTRID(this.ytRIDptr); 
+			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
+			console.log(this.ytRIDs.plist[this.ytRIDptr]); 
+			this.ytRIDptr++; 
+			console.log("added to ytrids"); 
+		//	console.log(this.ytRIDs[this.ytRIDptr--]); 
+			
+		}
 	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
 	}
-
 	
     this.clickEvent = function(e){
       var i = $(e.target).closest("tr").attr("id");
@@ -238,6 +265,9 @@ function initialize(){
 	window.current_pld = new current_pl("current-pl");
 	//window.current_pl = new pl_div();
     pl_manager = new playlist();
+	currentYTSongs = current_pld.ytSongs;
+	currentYTSongsRIDs = current_pld.ytRIDs;
+   
    
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
