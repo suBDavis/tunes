@@ -16,7 +16,7 @@ function onYouTubeIframeAPIReady() {
     height: '390',
     width: '640',
 
-	videoID: currentYTSongsRIDs.getCurrent(), 
+	videoID: current_pld.ytSongs.getCurrent(), 
 	//videoId: currentYTSongs.getNext(),
 	  //pl_manager.getNext(),
 	  //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
@@ -43,16 +43,18 @@ function onPlayerStateChange(event) {
   //later we should check that the next song is actually a youtube song, and that we dont need to switch players here
   if (event.data == YT.PlayerState.ENDED) {
 	 // console.log(currentYTSongsRIDs.getCurrent()); 
-	 // console.log(currentYTSongsRIDs.getNext()); 
-	  ytLoadSong(currentYTSongsRIDs.getNext()); 
+	 // console.log(currentYTSongsRIDs.getNext());
+   var nextSongId = current_pld.ytSongs.getNext().songid;
+   console.log(nextSongId); 
+	  ytLoadSong(nextSongId); 
   }
 }
 function stopVideo() {
   ytplayer.stopVideo();
 }
 
-function ytLoadSong(songid){
-  ytplayer.loadVideoById({'videoId': songid});
+function ytLoadSong(resourceid){
+  ytplayer.loadVideoById({'videoId': resourceid});
 }
 
 function ytCuePlaylist(plist){

@@ -5,7 +5,8 @@ var playlist = function(){
 
     this.getNext = function(){
         //return the next song and increment the playlist pointer
-        return this.plist[this.pointer++];
+        var ret = this.plist[this.pointer++];
+        return ret;
     }
 	
 	this.getCurrent = function() { 
@@ -18,7 +19,7 @@ var playlist = function(){
         //song should be one of the source-agnostic song objects from index.js probably.
         this.plist.push(song);
 
-        if(this.plist.length >= 1){
+        if(this.plist.length <= 1){
             //we added the first song.  Let the playing begin!
             ytLoadSong(this.plist[this.pointer]);
             this.pointer++;
