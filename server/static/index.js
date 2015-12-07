@@ -58,13 +58,15 @@ var current_pl = function(){
 	
 	this.enter_pl.submit(function (e) {
 		e.preventDefault();
+		console.log("subplid is in enter_pl: "+this.subplid);
+		window.current_pld.subplid = $("#current-pl-input").val();
 		window.current_pld.loadplrequest(e);
 	});
 	
 	this.loadplrequest=function(e){
+		//this.subplid = $("#current-pl-input").val()
 		console.log("submit pl id");
-		this.subplid = $("#current-pl-input").val()
-		console.log(this.subplid);
+		console.log("subplid is: "+this.subplid);
 		ajax("/api/playlist/"+this.subplid,loadpl)
 	}
 	
@@ -247,6 +249,12 @@ function initialize(){
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
+//	updatepl();	
+}
+
+function updatepl() {
+	window.current_pld.loadplrequest();
+	setTimeout(updatepl, 500);
 }
 
 //========================================
