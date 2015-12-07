@@ -74,11 +74,11 @@ def removeFromPL(plid):
     #since this is a delete, we can assume the client wants to remove a track.
     #because the track must already be in the DB, we only need songid and plid
     song_id = request.form['song_id']
-    print(song_id)
+    #print(song_id)
     order = request.form['orderi']
-    print(order)
+    #print(order)
     playlist_id = plid  
-    print(plid)
+    #print(plid)
     return jsonify(sql.removeFromPL(song_id, order, playlist_id))
 
 @app.route("/api/playlist/<plid>", methods=['GET'])

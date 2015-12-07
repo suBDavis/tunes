@@ -17,6 +17,8 @@ function song(songtype, songid, resourceid, artist, songtitle,orderi){
   this.artist = artist;
   this.songtitle = songtitle;
   this.orderi = orderi;
+  
+  console.log("Title: "+songtitle+" orderi: "+orderi);
 }
 
 //-------------------------------------------
@@ -51,6 +53,7 @@ var current_pl = function(){
 	this.rids = {};
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
+	this.lastorderi;
 	this.lastsong;
 	
 	this.enter_pl.submit(function (e) {
@@ -85,35 +88,57 @@ var current_pl = function(){
 	
 	var plreturn=function(res){
 		res = JSON.parse(res);
-		console.log(res);
+		//console.log(res);
 		var plid = res['plid'];
 		var orderi = res['orderi'];
-		console.log(plid);
-		console.log(orderi);
+		//console.log(plid);
+		//console.log(orderi);
 		window.current_pld.pl.setplid(plid);
-		window.current_pld.lastsong.orderi=orderi;
+		window.current_pld.lastorderi=orderi;
 		window.current_pld.divid.empty();
 		window.current_pld.divid.append("Current Playlist ID: "+plid);
+		window.current_pld.addSongOrderi(orderi);
 	}
 	
 	this.addSong = function(song){
-		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
-		this.divtb.append(newnode);
-		this.pl.append(song);
-		this.rids[song.resourceid] = song;
-	    $("#current-pl a").on('click',function(e){
-	      window.current_pld.clickEvent(e);
-		});
 		this.lastsong = song;
 		ajax_post("/api/playlist/"+this.pl.plid + "/song", "type="+song.songtype+"&song_id="+song.resourceid+"&title="+song.songtitle+"&artist="+song.artist, plreturn);
+		
+		//song.orderi = this.lastorderi;
+		//console.log("song orderi is: ");
+		//console.log(song.orderi);
+		//console.log("Song in addSong is:");
+		//console.log(song);
+		//var newnode = "<tr id='"+song.orderid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		//this.divtb.append(newnode);
+		//this.pl.append(song);
+		//this.rids[song.orderi] = song;
+	    //$("#current-pl a").off().on('click',function(e){
+	    //  window.current_pld.clickEvent(e);
+		//});
+		//console.log(song);
+		//console.log(this.rids);
+	}
+	
+	this.addSongOrderi=function(orderi){
+		var s = new song(this.lastsong.songtype, this.lastsong.songid, this.lastsong.resourceid, this.lastsong.artist, this.lastsong.songtitle, orderi)
+		var newnode = "<tr id='"+s.orderi+"'><td class='a'>" + s.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + s.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		this.divtb.append(newnode);
+		this.pl.append(s);
+		this.rids[s.orderi] = s;
+	    $("#current-pl a").off().on('click',function(e){
+	      window.current_pld.clickEvent(e);
+		});
+		console.log(s);
+		console.log(this.rids);
 	}
 	
 	this.addSongNodeOnly = function(song){
-		var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(song);
-		this.rids[song.resourceid] = song;
-	    $("#current-pl a").on('click',function(e){
+		this.rids[song.orderi] = song;
+	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
 	}
@@ -123,13 +148,16 @@ var current_pl = function(){
       var i = $(e.target).closest("tr").attr("id");
 	  $(e.target).closest("tr").remove();
       var clicked = window.current_pld.rids[i];
+	  console.log("clicked");
+	  console.log(i);
+	  console.log(clicked);
       this.pl.remove(clicked);
 	  this.dbremove(clicked);
 	  console.log(clicked);	  
   }
   
   this.dbremove=function(song){
-	  console.log("im in dbremove");
+	  console.log("im in dbremove with song order:");
 	  console.log(song.orderi);
 	  ajax_delete("/api/playlist/"+this.pl.plid+"/song", "song_id="+song.resourceid+"&orderi="+song.orderi, songremoved)
   }
