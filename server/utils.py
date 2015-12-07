@@ -61,13 +61,13 @@ class SQL:
         return self.checkReturn(result, "artists")
 
     def search(self, searchterm):
-        sql = "(SELECT guid, artist, title, COUNT(*) C FROM sp_songs WHERE title LIKE %s GROUP BY title ORDER BY C DESC LIMIT 10) UNION (SELECT guid, artist , '' title, COUNT(*) AS C FROM sp_songs WHERE artist LIKE %s GROUP BY artist ORDER BY C DESC LIMIT 10) ORDER BY C DESC LIMIT 10"
+        sql = "(SELECT guid, artist, title, COUNT(*) C FROM sp_songs WHERE title LIKE %s AND rid != 'na' GROUP BY title ORDER BY C DESC LIMIT 10) UNION (SELECT guid, artist , '' title, COUNT(*) AS C FROM sp_songs WHERE artist LIKE %s AND rid != 'na' GROUP BY artist ORDER BY C DESC LIMIT 10) ORDER BY C DESC LIMIT 10"
         params = (searchterm + "%", "%"+searchterm+"%")
         result = self.query(sql, params)
         return self.checkReturn(result, "search_result")
 
     def finiteSearch(self, artist, title):
-        sql = "SELECT artist, title, album, guid, resource_id, type FROM sp_songs S JOIN resource R ON S.rid = R.rid WHERE title LIKE %s AND artist LIKE %s LIMIT 10"
+        sql = "SELECT artist, title, album, guid, resource_id, type FROM sp_songs S JOIN resource R ON S.rid = R.rid WHERE title LIKE %s AND artist LIKE %s AND S.rid != 'na' LIMIT 10"
         params = (title, artist)
         result = self.query(sql, params)
         return self.checkReturn(result, "search_result")

@@ -30,6 +30,7 @@ var playlist = function(){
 		if (this.plist.length >= 1) { 
 			ytCuePlaylist(this.plist); 
 		}
+        this.pl_changed();
 	}
 	
 	this.remove = function(song){ 
@@ -41,6 +42,7 @@ var playlist = function(){
 				this.plist.splice(i, 1);
 			}
 		}
+        this.pl_changed();
 	}
 	
 	this.setplid = function(newplid){
@@ -57,5 +59,9 @@ var playlist = function(){
 	this.setlastorder = function(orderi){
 		(this.plist[this.plist.length-1]).orderi(orderi);
 	}
+
+    this.pl_changed = function(){
+        console.log("playlist was modified");
+    }
 	
 };
