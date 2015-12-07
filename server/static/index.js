@@ -103,6 +103,7 @@ var current_pl = function(){
 		var orderi = res['orderi'];
 		//console.log(plid);
 		//console.log(orderi);
+		window.current_pld.subplid = plid;
 		window.current_pld.pl.setplid(plid);
 		window.current_pld.lastorderi=orderi;
 		window.current_pld.divid.empty();
