@@ -12,7 +12,7 @@ var pl_manager = new playlist();
 
 function onYouTubeIframeAPIReady() {
   //TODO : make this universal
-  player = new YT.Player('player', {
+  ytplayer = new YT.Player('player', {
     height: '390',
     width: '640',
 
@@ -42,7 +42,9 @@ function onPlayerStateChange(event) {
   //play the next song in the playlist queue if the current one is over.
   //later we should check that the next song is actually a youtube song, and that we dont need to switch players here
   if (event.data == YT.PlayerState.ENDED) {
-    ytLoadSong(pl_manager.getNext())
+	 // console.log(currentYTSongsRIDs.getCurrent()); 
+	 // console.log(currentYTSongsRIDs.getNext()); 
+	  ytLoadSong(currentYTSongsRIDs.getNext()); 
   }
 }
 function stopVideo() {
@@ -51,6 +53,10 @@ function stopVideo() {
 
 function ytLoadSong(songid){
   ytplayer.loadVideoById({'videoId': songid});
+}
+
+function ytCuePlaylist(plist){
+	ytplayer.cuePlaylist({'playlist' : plist}); 
 }
 
 // ====================================
@@ -113,11 +119,11 @@ function ytCueSong(resourceid) {
   player.cueVideoById({'videoId': resourceid});
 }
 
-function ytLoadSong(resourceid) {
+/*function ytLoadSong(resourceid) {
   player.loadVideoById({'videoId' : resourceid}); 
 }
 
 function ytCuePlaylist(plist){
 	player.cuePlaylist({'playlist' : plist}); 
 }
-
+*/
