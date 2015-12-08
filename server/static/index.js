@@ -433,7 +433,7 @@ function searchbar(tagid){
   this.updateDisplay = function(){
     this.search_id.empty();
     for(var i = 0; i<this.list.length; i++){
-      var newli = $("<a href='#" +this.list[i]["classtype"]+ "' id="+this.list[i]["divid"]+" class='collection-item "+this.list[i]["classtype"]+"'>"+ this.list[i]["artist"] + " " + this.list[i]['title'] + "</a>");
+      var newli = $("<a href='javascript:;' id="+this.list[i]["divid"]+" class='collection-item "+this.list[i]["classtype"]+"'>"+ this.list[i]["artist"] + " " + this.list[i]['title'] + "</a>");
       this.search_id.append(newli);
     }
   }
