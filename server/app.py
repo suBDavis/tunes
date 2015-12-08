@@ -10,7 +10,11 @@ yt = Youtube()
 
 @app.route("/")
 def index():
-    return render_template('index.html', id=config.getVersion())
+    return render_template('index.html', id=config.getVersion(), plid="")
+
+@app.route("/<plid>")
+def indexwithplid(plid):
+    return render_template('index.html', id=config.getVersion(), plid=plid)
 
 @app.route("/api")
 def hello():

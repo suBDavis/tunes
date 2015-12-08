@@ -75,10 +75,10 @@ var current_pl = function(){
 		//this.subplid = $("#current-pl-input").val()
 		//console.log("submit pl id");
 		//console.log("subplid is: "+this.subplid);
-		ajax("/api/playlist/"+this.subplid,loadpl)
+		ajax("/api/playlist/"+this.subplid, this.loadpl)
 	}
 	
-	var loadpl=function(res){
+	this.loadpl=function(res){
 		console.log(res);
 		res=JSON.parse(res);
 		if (res.pl_result.length > 0){ //TODO: handle when they enter a nonexistent pl
@@ -557,5 +557,12 @@ function results(tagid){
     this.scdiv.show();
     this.ytdiv.show();
     this.div.show();
+  }
+}
+
+function loadPLID(plid){
+  if (plid.length > 0){
+    current_pld.subplid = plid;
+    current_pld.loadplrequest(null); //null because it expects an event but I want to use it anyway
   }
 }

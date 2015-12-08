@@ -31,6 +31,8 @@ function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
   //I'll deal with this later.
   event.target.playVideo();
+  //see if there is a playlist already waiting to be queued.
+  loadPLID( $("#initial_plid")[0].innerHTML);
   //pl_manager.append("string");
 }
 // 5. The API calls this function when the player's state changes.
@@ -44,8 +46,8 @@ function onPlayerStateChange(event) {
 	 // console.log(currentYTSongsRIDs.getCurrent()); 
 	 // console.log(currentYTSongsRIDs.getNext());
 	 var nextSongRID = current_pld.ytRIDs[ytRIDptr];
-   console.log(nextSongId); 
-   ytLoadSong(nextSongId); 
+   // console.log(nextSongId); 
+   // ytLoadSong(nextSongId); 
   }
 }
 function stopVideo() {
@@ -113,6 +115,9 @@ function uniPlayer(youtube, soundcloud){
   }
   this.playIndexFromPlaylist = function(index){
     //what to do if a user clicks play on a particular song in the PL
+  }
+  this.playerReady=function(){
+    //move shit here.
   }
 }
 

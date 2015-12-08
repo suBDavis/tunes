@@ -22,7 +22,7 @@ var playlist = function(){
 
         if(this.plist.length <= 1){
             //we added the first song.  Let the playing begin!
-            ytLoadSong(this.plist[this.pointer]);
+            ytLoadSong(this.plist[this.pointer].resourceid);
             this.pointer++;
         }
     }
