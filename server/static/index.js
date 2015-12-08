@@ -8,6 +8,7 @@
 var pl_manager = null; 
 var currentYTSongs = null;
 var currentYTSongsRIDs = null; 
+var ytRIDptr = 0; 
 
 //-------------------------------------------
 // Song object that is ambuguous to source 
@@ -57,7 +58,7 @@ var current_pl = function(){
 	this.rids = {};
 	this.ytSongs = new playlist(); 
 	this.ytRIDs = new playlist();
-	this.ytRIDptr = 0; 
+	//this.ytRIDptr = 0; 
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
 	this.lastorderi;
@@ -72,12 +73,12 @@ var current_pl = function(){
 	
 	this.loadplrequest=function(e){
 		//this.subplid = $("#current-pl-input").val()
-		console.log("submit pl id");
-		console.log("subplid is: "+this.subplid);
-		ajax("/api/playlist/"+this.subplid,loadpl)
+		//console.log("submit pl id");
+		//console.log("subplid is: "+this.subplid);
+		ajax("/api/playlist/"+this.subplid, this.loadpl)
 	}
 	
-	var loadpl=function(res){
+	this.loadpl=function(res){
 		console.log(res);
 		res=JSON.parse(res);
 		if (res.pl_result.length > 0){ //TODO: handle when they enter a nonexistent pl
@@ -87,7 +88,7 @@ var current_pl = function(){
 			window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
 			for (var i=0; i < res.pl_result.length; i++){
 				var s = new song(res.pl_result[i]['songtype'],0,res.pl_result[i]['rid'],res.pl_result[i]['artist'],res.pl_result[i]['title'],res.pl_result[i]['orderi']);
-				console.log(s.orderi)
+				//console.log(s.orderi)
 				window.current_pld.addSongNodeOnly(s);
 			}
 			//window.current_pld.pl.empty();
@@ -102,6 +103,7 @@ var current_pl = function(){
 		var orderi = res['orderi'];
 		//console.log(plid);
 		//console.log(orderi);
+		window.current_pld.subplid = plid;
 		window.current_pld.pl.setplid(plid);
 		window.current_pld.lastorderi=orderi;
 		window.current_pld.divid.empty();
@@ -137,11 +139,13 @@ var current_pl = function(){
 		this.rids[s.orderi] = s;
 		if (s.songtype == "youtube") {
 			this.ytSongs.append(s);
+			console.log(ytRIDptr); 
 			console.log("added to yt");
 			this.ytRIDs.appendYTRID(s.resourceid); 
 			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
-			console.log(this.ytRIDs.plist[this.ytRIDptr]);
-			this.ytRIDptr++; 
+			console.log(this.ytRIDs.plist[ytRIDptr]);
+			ytRIDptr++; 
+			console.log(ytRIDptr);
 			console.log("added to ytrids"); 
 		}
 	    $("#current-pl a").off().on('click',function(e){
@@ -152,7 +156,7 @@ var current_pl = function(){
 	}
 	
 	this.addSongNodeOnly = function(song){
-	var newnode = "<tr id='"+song.resourceid+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
+	var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
 	 + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(song);
@@ -163,8 +167,8 @@ var current_pl = function(){
 			this.ytRIDs.appendYTRID(song.resourceid); 
 			//this.ytRIDs.appendYTRID(this.ytRIDptr); 
 			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
-			console.log(this.ytRIDs.plist[this.ytRIDptr]); 
-			this.ytRIDptr++; 
+			console.log(this.ytRIDs.plist[ytRIDptr]); 
+			ytRIDptr++; 
 			console.log("added to ytrids"); 
 		//	console.log(this.ytRIDs[this.ytRIDptr--]); 
 			
@@ -271,7 +275,6 @@ function initialize(){
 	currentYTSongs = current_pld.ytSongs;
 	currentYTSongsRIDs = current_pld.ytRIDs;
    
-   
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
     $("#search-ajax").on('click', function(e){ generateResults(e); });
@@ -280,12 +283,12 @@ function initialize(){
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
-//	updatepl();	
+	//updatepl();	
 }
 
 function updatepl() {
 	window.current_pld.loadplrequest();
-	setTimeout(updatepl, 500);
+	setTimeout(updatepl, 1000);
 }
 
 //========================================
@@ -554,5 +557,12 @@ function results(tagid){
     this.scdiv.show();
     this.ytdiv.show();
     this.div.show();
+  }
+}
+
+function loadPLID(plid){
+  if (plid.length > 0){
+    current_pld.subplid = plid;
+    current_pld.loadplrequest(null); //null because it expects an event but I want to use it anyway
   }
 }

@@ -2,16 +2,17 @@ var playlist = function(){
 	this.plid=0; //starts at 0 
     this.plist = [];
     this.pointer = 0;
+	this.pointer2 = 0; 
 
     this.getNext = function(){
         //return the next song and increment the playlist pointer
-        var ret = this.plist[this.pointer++];
+        var ret = this.plist[this.pointer+1];
         return ret;
     }
 	
 	this.getCurrent = function() { 
 		return this.plist[this.pointer]; 
-		this.pointer++; 
+		this.pointer2++; 
 	}
 	
     this.append = function(song){
@@ -21,7 +22,7 @@ var playlist = function(){
 
         if(this.plist.length <= 1){
             //we added the first song.  Let the playing begin!
-            ytLoadSong(this.plist[this.pointer]);
+            ytLoadSong(this.plist[this.pointer].resourceid);
             this.pointer++;
         }
     }

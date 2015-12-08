@@ -15,8 +15,7 @@ function onYouTubeIframeAPIReady() {
   ytplayer = new YT.Player('player', {
     height: '390',
     width: '640',
-
-	videoID: current_pld.ytSongs.getCurrent(), 
+	videoID: current_pld.ytRIDs[ytRIDptr],
 	//videoId: currentYTSongs.getNext(),
 	  //pl_manager.getNext(),
 	  //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
@@ -32,6 +31,8 @@ function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
   //I'll deal with this later.
   event.target.playVideo();
+  //see if there is a playlist already waiting to be queued.
+  loadPLID( $("#initial_plid")[0].innerHTML);
   //pl_manager.append("string");
 }
 // 5. The API calls this function when the player's state changes.
@@ -44,9 +45,9 @@ function onPlayerStateChange(event) {
   if (event.data == YT.PlayerState.ENDED) {
 	 // console.log(currentYTSongsRIDs.getCurrent()); 
 	 // console.log(currentYTSongsRIDs.getNext());
-   var nextSongId = current_pld.ytSongs.getNext().songid;
-   console.log(nextSongId); 
-	  ytLoadSong(nextSongId); 
+	 var nextSongRID = current_pld.ytRIDs[ytRIDptr];
+   // console.log(nextSongId); 
+   // ytLoadSong(nextSongId); 
   }
 }
 function stopVideo() {
@@ -58,7 +59,7 @@ function ytLoadSong(resourceid){
 }
 
 function ytCuePlaylist(plist){
-	ytplayer.cuePlaylist({'playlist' : plist}); 
+  ytplayer.cuePlaylist({'playlist' : plist}); 
 }
 
 // ====================================
@@ -114,6 +115,9 @@ function uniPlayer(youtube, soundcloud){
   }
   this.playIndexFromPlaylist = function(index){
     //what to do if a user clicks play on a particular song in the PL
+  }
+  this.playerReady=function(){
+    //move shit here.
   }
 }
 
