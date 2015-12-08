@@ -58,6 +58,10 @@ def ytsearch(query):
     response = yt.youtube_search(options)
     return jsonify(response)
 
+@app.route("/api/suggestions/artist/<artist>/title/<title>")
+def suggestions(artist, title):
+    return jsonify(sql.correlation(artist, title))
+
 #-------------------
 # Playlist-related queries - currently unimplemented
 #-------------------

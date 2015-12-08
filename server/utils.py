@@ -74,9 +74,26 @@ class SQL:
         params = (title, artist)
         result = self.query(sql, params)
         return self.checkReturn(result, "search_result")
-    
-    #this section manages playlist stuff
 
+    def correlation(self, artist, title):
+        # '--none--' means we don't want this param set
+        sql = "SELECT R2.songid, title, artist, COUNT(R2.songid) CT FROM sp_relation R JOIN sp_relation R2 ON R.plid = R2.plid JOIN sp_songs S ON R2.songid = S.guid WHERE R.songid IN ( SELECT guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s ) AND artist NOT LIKE %s GROUP BY title ORDER BY CT DESC LIMIT 20"
+        params = (title, artist, artist)
+
+        notset = "--none--"
+        if(artist == notset):
+            artist = '%'
+            #we don't want to use the "artist not like" stipulation if there is no artist.
+            sql = "SELECT R2.songid, title, artist, COUNT(R2.songid) CT FROM sp_relation R JOIN sp_relation R2 ON R.plid = R2.plid JOIN sp_songs S ON R2.songid = S.guid WHERE R.songid IN ( SELECT guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s ) GROUP BY title ORDER BY CT DESC LIMIT 20"
+            params = (title, artist)
+        if(title == notset):
+            title = '%'
+            params = (title, artist, artist)
+
+        result = self.query(sql, params)
+        return self.checkReturn(result, "suggestions")
+
+    #this section manages playlist stuff
 
     def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
