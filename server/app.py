@@ -6,7 +6,7 @@ config = Config()
 app = Flask(__name__)
 CORS(app)
 sql = SQL(config)
-yt = Youtube()
+yt = Youtube(config)
 
 @app.route("/")
 def index():

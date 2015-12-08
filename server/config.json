@@ -12,5 +12,10 @@
         "client_secret" : "37a075265339487c891163a5aef0ea3b",
         "redirect_uri" : "http://localhost:8888/callback",
         "username" : "subdaivs"
+    },
+    "youtube" : {
+        "DEVELOPER_KEY" : "AIzaSyDPjXLEMUg88abHOXhL-PoOTWnkcvHU11o",
+        "YOUTUBE_API_SERVICE_NAME" : "youtube",
+        "YOUTUBE_API_VERSION" : "v3"
     }
 }

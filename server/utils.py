@@ -26,6 +26,9 @@ class Config:
     def getVersion(self):
         return self.config['version']
 
+    def getYoutube(self):
+        return self.config['youtube']
+
 class SQL:
 
     def __init__(self, config):
@@ -174,17 +177,17 @@ class SQL:
             return { setname : result }
 
 class Youtube:
-    def __init__(self):
-        self.DEVELOPER_KEY = "AIzaSyDPjXLEMUg88abHOXhL-PoOTWnkcvHU11o"
-        self.YOUTUBE_API_SERVICE_NAME = "youtube"
-        self.YOUTUBE_API_VERSION = "v3"
+    def __init__(self, config):
+        yt_cfg = config.getYoutube()
+        self.DEVELOPER_KEY = yt_cfg['DEVELOPER_KEY']
+        self.YOUTUBE_API_SERVICE_NAME = yt_cfg['YOUTUBE_API_SERVICE_NAME']
+        self.YOUTUBE_API_VERSION = yt_cfg['YOUTUBE_API_VERSION']
+        self.youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,developerKey=self.DEVELOPER_KEY)
 
     def youtube_search(self,options):
-        youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,
-        developerKey=self.DEVELOPER_KEY)
         # Call the search.list method to retrieve results matching the specified
         # query term.
-        search_response = youtube.search().list(
+        search_response = self.youtube.search().list(
             q=options.q,
             part="id,snippet",
             maxResults=options.max_results,
