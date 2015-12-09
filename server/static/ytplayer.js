@@ -46,8 +46,8 @@ function onPlayerStateChange(event) {
 	 // console.log(currentYTSongsRIDs.getCurrent()); 
 	 // console.log(currentYTSongsRIDs.getNext());
 	 var nextSongRID = current_pld.ytRIDs[ytRIDptr];
-   // console.log(nextSongId); 
-   // ytLoadSong(nextSongId); 
+   // console.log(nextSongRID); 
+   // ytLoadSong(nextSongRID); 
   }
 }
 function stopVideo() {
