@@ -469,18 +469,20 @@ function generateResults(e){
     }
     window.searchr.updateYT();
   });
-  //look for sugestions first.  This query takes a while so we'll go ahead and kick it off
-  ajax("/api/suggestions/artist/" + artist + "/title/" + title, function(res){
-    //callback for when the ajax completes
-    res = JSON.parse(res)
-    for (var i=0;i<res.suggestions.length;i++){
-      var sdata = res.suggestions[i];
-      //create ubiquitous song object
-      var recommended_song = new song(sdata.type, sdata.guid, sdata.resource_id, sdata.artist, sdata.title);
-      window.searchr.addItem(recommended_song, "rec");
-    }
-    window.searchr.updateRecommended();
-  });
+  //look for sugestions ONLY IF there is a title.  Otherwise the query will take too long
+  if(title != "--none--"){
+    ajax("/api/suggestions/artist/" + artist + "/title/" + title, function(res){
+      //callback for when the ajax completes
+      res = JSON.parse(res)
+      for (var i=0;i<res.suggestions.length;i++){
+        var sdata = res.suggestions[i];
+        //create ubiquitous song object
+        var recommended_song = new song(sdata.type, sdata.guid, sdata.resource_id, sdata.artist, sdata.title);
+        window.searchr.addItem(recommended_song, "rec");
+      }
+      window.searchr.updateRecommended();
+    });
+  }
 }
 
 function searchSC(terms, callbacksc){
