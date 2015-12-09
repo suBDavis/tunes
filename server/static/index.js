@@ -355,7 +355,7 @@ function initialize(){
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
-	//updatepl();	
+	updatepl();	
 }
 
 function updatepl() {
