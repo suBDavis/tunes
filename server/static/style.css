@@ -85,7 +85,7 @@ td.c {
 
 #left-pane {
 	position: fixed;
-	height: 100%;
+	height: 700px;
 	z-index: 1000;
 	background-color: #e0e0d1;
 }
@@ -94,4 +94,5 @@ td.c {
 	position: absolute-left;
 	overflow: scroll;
 	margin-top: 90px;
+	margin-bottom: 90px;
 }
