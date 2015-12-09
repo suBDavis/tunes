@@ -353,8 +353,8 @@ function generateResults(e){
     artist = searchterms;
     title = ""
   } else {
-    artist = target.artist == "" ? "%25" : target.artist;
-    title = target['title'] == "" ? "%25" : target['title']
+    artist = target.artist == "" ? "--none--" : target.artist;
+    title = target['title'] == "" ? "--none--" : target['title']
     window.top_searchbar.set(e.target.innerHTML);
     searchterms = e.target.innerHTML;
   }
@@ -396,6 +396,18 @@ function generateResults(e){
       window.searchr.addItem(result_song, "yt");
     }
     window.searchr.updateYT();
+  });
+  //look for sugestions first.  This query takes a while so we'll go ahead and kick it off
+  ajax("/api/suggestions/artist/" + artist + "/title/" + title, function(res){
+    //callback for when the ajax completes
+    res = JSON.parse(res)
+    for (var i=0;i<res.suggestions.length;i++){
+      var sdata = res.suggestions[i];
+      //create ubiquitous song object
+      var recommended_song = new song(sdata.type, sdata.guid, sdata.resource_id, sdata.artist, sdata.title);
+      window.searchr.addItem(recommended_song, "rec");
+    }
+    window.searchr.updateRecommended();
   });
 }
 
@@ -466,9 +478,11 @@ function results(tagid){
   this.tagid = tagid;
   this.list = [];
   this.sclist = [];
-  this.scdiv = $("#sc-results-table")
+  this.scdiv = $("#sc-results-table");
   this.ytlist = [];
-  this.ytdiv = $("#yt-results-table")
+  this.ytdiv = $("#yt-results-table");
+  this.reclist = [];
+  this.recdiv = $("#rec-results-table");
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
@@ -480,6 +494,9 @@ function results(tagid){
       this.sr[dict_item.resourceid] = dict_item;
     }else if (type=="yt"){
       this.ytlist.push(dict_item);
+      this.sr[dict_item.resourceid] = dict_item;
+    }else if(type=="rec"){
+      this.reclist.push(dict_item);
       this.sr[dict_item.resourceid] = dict_item;
     }else {
       this.list.push(dict_item);
@@ -510,6 +527,22 @@ function results(tagid){
       window.searchr.clickEvent(e);
     });
   }
+  this.updateRecommended = function(){
+    var l = this.reclist;
+    this.reclist = [];
+    this.recdiv.empty();
+    //console.log(l);
+    //console.log(this.list);
+    for(var i=0;i<l.length;i++){
+      var a = l[i];
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      this.recdiv.append(newnode);
+    }
+    this.show();
+    $("#rec-results-table a").on('click',function(e){
+      window.searchr.clickEvent(e);
+    });
+  }
   this.updateSC = function(){
     var l = this.sclist;
     //console.log(l);
@@ -517,7 +550,7 @@ function results(tagid){
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a['songtitle'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
     this.show();
@@ -557,6 +590,7 @@ function results(tagid){
     this.scdiv.show();
     this.ytdiv.show();
     this.div.show();
+    this.recdiv.show();
   }
 }
 

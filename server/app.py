@@ -47,10 +47,13 @@ def search(terms):
 
 @app.route("/api/search/artist/<artist>/title/<title>")
 def finiteSearch(artist, title):
+    # artist = artist.replace("--none--" , '%')
+    # title = title.replace("--none--", '%')
     return jsonify(sql.finiteSearch(artist, title))
 
 @app.route("/api/ytsearch/video/<query>")
 def ytsearch(query):
+    query = query.replace("--none--", "")
     options = YTparam()
     setattr(options, 'q' , query)
     setattr(options, 'max_results' , 10)
