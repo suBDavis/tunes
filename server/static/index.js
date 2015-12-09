@@ -64,6 +64,7 @@ var current_pl = function(){
 	this.lastorderi;
 	this.lastsong;
 	
+	
 	this.enter_pl.submit(function (e) {
 		e.preventDefault();
 		//console.log("subplid is in enter_pl: "+this.subplid);
@@ -355,7 +356,7 @@ function initialize(){
     SC.initialize({
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
-	//updatepl();	
+	updatepl();	
 }
 
 function updatepl() {

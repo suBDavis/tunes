@@ -12,7 +12,22 @@ var playlist = function(){
 	
 	this.getCurrent = function() { 
 		return this.plist[this.pointer]; 
-		this.pointer2++; 
+		//this.pointer2++; 
+	}
+	
+	
+	this.setPointToSong(song, ndeletedbefore){ //when updating playlist from sync: index.js stores what song was current before the update, then this function checks to see if that song is still in the playlist and if so sets the point to it; if it's not still in the playlist, it sets the pointer to the current pointer minus the number of songs deleted before the current pointer
+		var exists=false;
+		for (var i=0;i<this.plist.length;i++){ 
+			if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi===song.orderi){ 
+				this.pointer=i;
+				exists=true;
+			}
+		}
+		if (!exists){
+			this.pointer = this.pointer-ndeletedbefore;
+		}
+		
 	}
 	
     this.append = function(song){
@@ -63,7 +78,7 @@ var playlist = function(){
 				delete this.plist[i];
 			}
 		}
-	}
+	}d
 	
 	this.setplid = function(newplid){
 		this.plid=newplid;
