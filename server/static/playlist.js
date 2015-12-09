@@ -19,12 +19,15 @@ var playlist = function(){
         //push to the end of the array list
         //song should be one of the source-agnostic song objects from index.js probably.
         this.plist.push(song);
+		//console.log("appended to plist");
+		//console.log(this.plist[0]);
 
         if(this.plist.length <= 1){
             //we added the first song.  Let the playing begin!
             ytLoadSong(this.plist[this.pointer].resourceid);
             this.pointer++;
         }
+		this.plist = this.plist.filter(function(){return true;});
     }
 	
 	this.appendYTRID = function(resID) {
@@ -35,9 +38,15 @@ var playlist = function(){
         this.pl_changed();
 	}
 	
+	this.addplistidx=function(j,s){
+		this.plist[j]=s;
+	}
+	
 	this.remove = function(song){ 
-		console.log("in playlist");
+		this.plist = this.plist.filter(function(){return true;});
+		console.log("in playlist: plist ");
 		console.log(this.plist);
+		console.log("in playlist: song ");
 		console.log(this.song);
 		for (var i=0;i<this.plist.length;i++){ //lol sorry i know there is a better way to do this i just dont know what it is rn
 			if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi===song.orderi){ 
@@ -45,6 +54,15 @@ var playlist = function(){
 			}
 		}
         this.pl_changed();
+		this.plist = this.plist.filter(function(){return true;});
+	}
+	
+	this.deletewithhole = function(song){
+		for (var i=0;i<this.plist.length;i++){
+			if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi===song.orderi){ 
+				delete this.plist[i];
+			}
+		}
 	}
 	
 	this.setplid = function(newplid){
@@ -64,6 +82,8 @@ var playlist = function(){
 
     this.pl_changed = function(){
         console.log("playlist was modified");
+		//console.log(plist);
+		this.plist = this.plist.filter(function(){return true;});
     }
 	
 };

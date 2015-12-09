@@ -66,7 +66,7 @@ var current_pl = function(){
 	
 	this.enter_pl.submit(function (e) {
 		e.preventDefault();
-		console.log("subplid is in enter_pl: "+this.subplid);
+		//console.log("subplid is in enter_pl: "+this.subplid);
 		window.current_pld.subplid = $("#current-pl-input").val();
 		window.current_pld.loadplrequest(e);
 	});
@@ -78,8 +78,82 @@ var current_pl = function(){
 		ajax("/api/playlist/"+this.subplid, this.loadpl)
 	}
 	
+	this.refreshpl=function(e){
+		ajax("/api/playlist/"+this.subplid, this.refreshplcheck)
+		//console.log("subplid is: "+this.subplid);
+	}
+	
+	this.refreshplcheck = function(res){
+		//console.log("in refresh pl check");
+		res = JSON.parse(res);
+		//console.log(res);
+		var plist = current_pld.pl.plist;
+		//console.log("plist is");
+		console.log(plist);
+		var jmax;
+		if (res.pl_result.length > plist.length){
+			jmax = res.pl_result.length;
+		} else {
+			jmax = plist.length;
+		}
+		var changed = false;
+		for (var j=jmax-1; j>=0; j--){
+			if (changed){
+				var plist = current_pld.pl.plist;
+			}
+			console.log("j is: ");
+			console.log(j);
+			console.log("jmax is: ");
+			console.log(jmax);
+			console.log("plist");
+			console.log(plist);
+			if (res.pl_result.length <= j || plist.length <= j || res.pl_result[j]['rid'] != plist[j].resourceid || res.pl_result[j]['orderi'] != plist[j].orderi){
+				changed = true;
+				if (res.pl_result.length <= j){
+					console.log("im in 1");
+					window.current_pld.pl.remove(plist[j]);
+				} else if (plist.length <= j) {
+					var s = new song(res.pl_result[j]['songtype'],0,res.pl_result[j]['rid'],res.pl_result[j]['artist'],res.pl_result[j]['title'],res.pl_result[j]['orderi']);
+					//window.current_pld.addSongNodeOnly(s);
+					window.current_pld.pl.addplistidx(j,s);
+					window.current_pld.rids[song.orderi] = s;
+					console.log("im in 2");
+				} else {
+					//console.log("plist[j] orderi");
+					//console.log(plist[j].orderi);
+					window.current_pld.pl.deletewithhole(plist[j]);
+					var s = new song(res.pl_result[j]['songtype'],0,res.pl_result[j]['rid'],res.pl_result[j]['artist'],res.pl_result[j]['title'],res.pl_result[j]['orderi']);
+					//window.current_pld.addSongNodeOnly(s);
+					console.log("im in 3");
+					window.current_pld.pl.addplistidx(j,s);
+					window.current_pld.rids[song.orderi] = s;
+				}
+				
+			}
+		}
+		if (changed){
+			window.current_pld.refreshhtml();
+			changed = false;
+		}
+	}
+	
+	this.refreshhtml = function(){
+		console.log("in refresh html");
+		window.current_pld.divtb.empty();		
+		//window.current_pld.divid.append("Current Playlist ID: "+window.current_pld.subplid);
+		var plist = window.current_pld.pl.plist;
+		for (var i = 0; i < plist.length; i++){
+			var song = plist[i];
+			var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
+			this.divtb.append(newnode);
+		}
+	    $("#current-pl a").off().on('click',function(e){
+	      window.current_pld.clickEvent(e);
+		});
+	}
+	
 	this.loadpl=function(res){
-		console.log(res);
+		//console.log(res);
 		res=JSON.parse(res);
 		if (res.pl_result.length > 0){ //TODO: handle when they enter a nonexistent pl
 			window.current_pld.divtb.empty();
@@ -139,14 +213,14 @@ var current_pl = function(){
 		this.rids[s.orderi] = s;
 		if (s.songtype == "youtube") {
 			this.ytSongs.append(s);
-			console.log(ytRIDptr); 
-			console.log("added to yt");
+			//console.log(ytRIDptr); 
+			//console.log("added to yt");
 			this.ytRIDs.appendYTRID(s.resourceid); 
 			//this.ytRIDs[this.ytRIDptr] = song.resourceid; 
-			console.log(this.ytRIDs.plist[ytRIDptr]);
+			//console.log(this.ytRIDs.plist[ytRIDptr]);
 			ytRIDptr++; 
-			console.log(ytRIDptr);
-			console.log("added to ytrids"); 
+			//console.log(ytRIDptr);
+			//console.log("added to ytrids"); 
 		}
 	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
@@ -287,7 +361,7 @@ function initialize(){
 }
 
 function updatepl() {
-	window.current_pld.loadplrequest();
+	window.current_pld.refreshpl();
 	setTimeout(updatepl, 1000);
 }
 
