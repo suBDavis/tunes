@@ -285,9 +285,7 @@ function ajax_delete(url, deleteinfo, callback) {
      //console.log("workd" + xhttp.responseText);
      var rtext = JSON.parse(xhttp.responseText);
      if(rtext['error']){
-      ajax("/api/mysql" , function(){
-        ajax(url, callback);
-      });
+      console.log("AJAX returned server error.")
      } else {
       callback(xhttp.responseText);
      }
@@ -305,9 +303,7 @@ function ajax_post(url, postinfo, callback) {
      //console.log("workd" + xhttp.responseText);
      var rtext = JSON.parse(xhttp.responseText);
      if(rtext['error']){
-      ajax("/api/mysql" , function(){
-        ajax(url, callback);
-      });
+      console.log("AJAX returned server error.")
      } else {
       callback(xhttp.responseText);
      }
@@ -329,9 +325,7 @@ function ajax(url, callback) {
      //console.log("workd" + xhttp.responseText);
      var rtext = JSON.parse(xhttp.responseText);
      if(rtext['error']){
-      ajax("/api/mysql" , function(){
-        ajax(url, callback);
-      });
+      console.log("AJAX returned server error.")
      } else {
       callback(xhttp.responseText);
      }

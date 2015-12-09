@@ -99,7 +99,7 @@ class SQL:
         if self.isNotSet(title):
             title = '%'
             params = (title, artist, artist)
-
+        print(params)
         result = self.query(sql, params)
         return self.checkReturn(result, "suggestions")
 
