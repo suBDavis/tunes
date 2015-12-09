@@ -84,6 +84,7 @@ var current_pl = function(){
 	}
 	
 	this.refreshplcheck = function(res){
+		window.current_pld.refreshhtml(); //maybe try to not have this happen every time, although was super buggy that way for some reason
 		//console.log("in refresh pl check");
 		res = JSON.parse(res);
 		//console.log(res);
@@ -105,14 +106,16 @@ var current_pl = function(){
 			console.log(j);
 			console.log("jmax is: ");
 			console.log(jmax);
-			console.log("plist");
-			console.log(plist);
-			if (res.pl_result.length <= j || plist.length <= j || res.pl_result[j]['rid'] != plist[j].resourceid || res.pl_result[j]['orderi'] != plist[j].orderi){
+			console.log("plist[j]");
+			console.log(plist[j]);
+			console.log("res[j]");
+			console.log(res.pl_result[j]);
+			if (res.pl_result.length <= j || plist.length <= j || plist[j] === undefined || res.pl_result[j]['rid'] != plist[j].resourceid || res.pl_result[j]['orderi'] != plist[j].orderi){
 				changed = true;
 				if (res.pl_result.length <= j){
 					console.log("im in 1");
 					window.current_pld.pl.remove(plist[j]);
-				} else if (plist.length <= j) {
+				} else if (plist.length <= j || plist[j] === undefined) {
 					var s = new song(res.pl_result[j]['songtype'],0,res.pl_result[j]['rid'],res.pl_result[j]['artist'],res.pl_result[j]['title'],res.pl_result[j]['orderi']);
 					//window.current_pld.addSongNodeOnly(s);
 					window.current_pld.pl.addplistidx(j,s);
@@ -145,6 +148,7 @@ var current_pl = function(){
 		for (var i = 0; i < plist.length; i++){
 			var song = plist[i];
 			var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
+			window.current_pld.rids[song.orderi] = song;
 			this.divtb.append(newnode);
 		}
 	    $("#current-pl a").off().on('click',function(e){
@@ -362,7 +366,7 @@ function initialize(){
 
 function updatepl() {
 	window.current_pld.refreshpl();
-	setTimeout(updatepl, 1000);
+	setTimeout(updatepl, 1500);
 }
 
 //========================================
