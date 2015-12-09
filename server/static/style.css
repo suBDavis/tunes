@@ -1,3 +1,7 @@
+.container-fluid {
+	background-color: #e0e0d1;
+}
+
 #search-ajax .db {
     background: white;
 }
@@ -17,6 +21,7 @@
     padding: 8px;
     margin:0px;
     box-sizing: border-box;
+	background-color: #ffffff;
 }
 #search:focus{
     border-color: black;
@@ -57,5 +62,36 @@ td.c {
 .b-small i{
     line-height: 25px;
 }
-h1 {
+#header-section {
+	background-color: #ffb366;
+	position: fixed;
+	height: 110px;
+	z-index: 1000;
+}
+
+.banner{
+	position: absolute-top;
+}
+	
+#right-pane{
+	background-color: #ffffff;
+}
+
+.right{
+	position: absolute-right;
+	margin-top: 90px;
+	margin-botton: 5px;
+}
+
+#left-pane {
+	position: fixed;
+	height: 100%;
+	z-index: 1000;
+	background-color: #e0e0d1;
+}
+
+.left {
+	position: absolute-left;
+	overflow: scroll;
+	margin-top: 90px;
 }
