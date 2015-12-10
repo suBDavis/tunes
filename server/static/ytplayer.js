@@ -79,6 +79,7 @@ function uniPlayer(){
       this.soundcloud.play();
     }
   }
+
   this.loadSong = function(){
     if (this.youtubeReady && this.soundcloudReady){
       //play whatever's in the queue
@@ -112,7 +113,7 @@ function uniPlayer(){
   //soundcloud functions
   this.scLoadSong = function(id){
     url = "http://api.soundcloud.com/tracks/" + id
-    options = {"show_artwork" : false};
+    options = {"show_artwork" : false, "auto_play" : true };
     this.soundcloud.load(url, options);
   }
 

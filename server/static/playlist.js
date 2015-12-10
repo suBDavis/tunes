@@ -15,6 +15,7 @@ var playlist = function(){
             //we added the first song.  Let the playing begin!
             //Tell the player that we have a song, and let the player decide when to play it if it's ready
             uniplayer.loadSong();
+            uniplayer.play();
         }
     }
 }

@@ -29,11 +29,7 @@ function onAdd(song_meta){
   //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
 
   console.log(song_meta);//here's whats inside.
-
   pl_manager.append(song_meta);
-
-  // the playlist object is in playlist.js (same folder)
-  // the youtube player is in ytplayer.js
 
 }
 
