@@ -105,14 +105,16 @@ function uniPlayer() {
 	  this.yt = ytplayer; 
   }
   
-  this.buttonClicked = function(id, type) {
+  this.playIndex = function(id, type) {
 	  stopVideo(); 
 	  this.sc.pause(); 
 	  this.resourceid = id; 
 	  this.resourcetype = type; 
-	  if (this.resourcetype == "youtube") { 
+	  if (this.resourcetype == "youtube") {
+		  //stopVideo();  
 		  ytLoadSong(this.resourceid);  
 	  } else { 
+		  //this.sc.pause(); 
 		  scLoadSong(this.resourceid);  
 	  }
   }
@@ -126,7 +128,7 @@ function uniPlayer() {
   }
   
   this.skip = function(){
-    //what do we do if skip is pressed?
+	  
   }
   
   this.playerReady = function(){

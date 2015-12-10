@@ -51,8 +51,9 @@ var current_pl = function(){
 	this.maxchars = 60;
 	this.pl = new playlist();
 	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small' id = 'mbtn'><i class='material-icons'>-</i></a>";
-	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light red darken-1 b-small' id = 'ytplaybtn'><i class='material-icons'>></i></a>";
+	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light red darken-1 b-small' id = 'ytplaybtn'><i class='tiny material-icons'>play_arrow</i></a>";
 	//waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>></i></a>";
+	this.skipbtn = "<a class = 'btn-floating waves-effect waves-light blue-grey darken-1 b-small' id = 'skipbtn'><i class = 'tiny material-icons'>fast_forward</i></a>"; 
 	this.rids = {};
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
@@ -151,16 +152,22 @@ var current_pl = function(){
 		var plist = window.current_pld.pl.plist;
 		for (var i = 0; i < plist.length; i++){
 			var song = plist[i];
-			var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
+			var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + 
+			song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + 
+			song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'c'>" 
+			+this.ytplaybtn + "</td><td class = 'c'>" + this.skipbtn + "</td></tr>";
 			window.current_pld.rids[song.orderi] = song;
 			this.divtb.append(newnode);
 		}
-	    $("#current-pl a").off().on('click',function(e){
+	    $("#current-pl #mbtn").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
 		$("#current-pl #ytplaybtn").off().on('click', function(e) {
 			window.current_pld.playSong(e);
 		}); 
+		$("#current-pl #skipbtn").off().on('click', function(e) {
+			window.current_pld.skipSong(e); 
+		});
 	}
 	
 	this.loadpl=function(res){
@@ -218,7 +225,9 @@ var current_pl = function(){
 	
 	this.addSongOrderi=function(orderi){
 		var s = new song(this.lastsong.songtype, this.lastsong.songid, this.lastsong.resourceid, this.lastsong.artist, this.lastsong.songtitle, orderi)
-		var newnode = "<tr id='"+s.orderi+"'><td class='a'>" + s.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + s.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+"</td></tr>";
+		var newnode = "<tr id='"+s.orderi+"'><td class='a'>" + s.artist.substring(0 , this.maxchars) 
+		+ "</td><td class='b'>" + s.songtitle.substring(0 , this.maxchars) +"</td><td class='c'>"+this.mbtn
+		+ "</td><td class = 'c'>" +this.ytplaybtn + "</td><td class = 'c'>" + this.skipbtn + "</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(s);
 		this.rids[s.orderi] = s;
@@ -233,19 +242,23 @@ var current_pl = function(){
 			//console.log(ytRIDptr);
 			//console.log("added to ytrids"); 
 		}
-	    $("#current-pl a").off().on('click',function(e){
+	    $("#current-pl #mbtn").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
 		$("#current-pl #ytplaybtn").off().on('click', function(e) {
 			window.current_pld.playSong(e);
 		}); 
+		$("#current-pl #skipbtn").off().on('click', function(e) {
+			window.current_pld.skipSong(e); 
+		});
 		console.log(s);
 		console.log(this.rids);
 	}
 	
 	this.addSongNodeOnly = function(song){
-	var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + song.songtitle.substring(0 , this.maxchars)
-	 + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'd'>" +this.ytplaybtn + "</td></tr>";
+	var newnode = "<tr id='"+song.orderi+"'><td class='a'>" + song.artist.substring(0 , this.maxchars) + "</td><td class='b'>" 
+		+ song.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.mbtn+ "</td><td class = 'c'>"
+		 +this.ytplaybtn + "</td><td class = 'c'>" + this.skipbtn + "</td></tr>";
 		this.divtb.append(newnode);
 		this.pl.append(song);
 		this.rids[song.orderi] = song;
@@ -261,12 +274,16 @@ var current_pl = function(){
 		//	console.log(this.ytRIDs[this.ytRIDptr--]); 
 			
 		}
-	    $("#current-pl a").off().on('click',function(e){
+	    $("#current-pl #mbtn").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
-		$("#ytplaybtn").off().on('click', function(e) {
+		$("#current-pl #ytplaybtn").off().on('click', function(e) {
 			window.current_pld.playSong(e);
 		}); 
+		$("#current-pl #skipbtn").off().on('click', function(e) {
+			window.current_pld.skipSong(e); 
+		});
+		
 	}
 	
     this.clickEvent = function(e){
@@ -286,7 +303,15 @@ var current_pl = function(){
   	var clicked = window.current_pld.rids[j]; 
   	var clickedRID = clicked.resourceid; 
  	var clickedType = clicked.songtype;
-	pl_manager.buttonClicked(clickedRID, clickedType);  
+	pl_manager.playIndex(clickedRID, clickedType);  
+}
+	this.skipSong = function(e) { 
+		var k = parseInt($(e.target).closest("tr").attr("id")); 
+		k+=1; 
+		var skipThis = window.current_pld.rids[k]; 
+		var skipThisRID = skipThis.resourceid; 
+		var skipThisType = skipThis.songtype; 
+		pl_manager.playIndex(skipThisRID, skipThisType); 
 }
   
   this.dbremove=function(song){

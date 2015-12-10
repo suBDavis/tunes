@@ -45,6 +45,16 @@
 .ytrt {
     background-color: #ff9980;
 }
+
+/*.material-icons, .icon-text {
+     vertical-align: middle !important;
+  }*/
+
+.material-icons {
+	font-size:1rem important!;
+	/*margin:auto;*/
+}
+ 
 td.a {
     width:25%;
 }
@@ -52,6 +62,9 @@ td.b {
     width: 70%;
 }
 td.c {
+/*	font-size: 1.5rem;
+	vertical-align: middle;
+	text-align: middle;*/
     width:5%;
 }
 .b-small {

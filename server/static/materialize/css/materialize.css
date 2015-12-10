@@ -2236,7 +2236,7 @@ thead {
 td, th {
   padding: 15px 5px;
   display: table-cell;
-  text-align: left;
+  text-align: middle;
   vertical-align: middle;
   border-radius: 2px; }
 
@@ -6257,7 +6257,8 @@ a.waves-effect .waves-ripple {
     float: right;
     font-size: 16px;
     line-height: 32px;
-    padding-left: 8px; }
+    padding-left: 8px;
+ }
 
 .materialboxed {
   display: block;
