@@ -88,13 +88,13 @@ class SQL:
 
     def correlation(self, artist, title):
         # '--none--' means we don't want this param set
-        sql = "SELECT title, artist, album, S.guid, type, resource_id, COUNT(R2.songid) CT  FROM sp_relation R JOIN sp_relation R2 ON R.plid = R2.plid JOIN sp_songs S ON R2.songid = S.guid JOIN resource Re ON S.rid = Re.rid WHERE R.songid IN ( SELECT guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s ) AND artist NOT LIKE %s GROUP BY title ORDER BY CT DESC LIMIT 10"
+        sql = "SELECT title, artist, album, S.guid, Re.type, resource_id, COUNT(R2.songid) CT  FROM sp_relation R JOIN sp_relation R2 ON R.plid = R2.plid JOIN sp_songs S ON R2.songid = S.guid JOIN resource Re ON S.rid = Re.rid WHERE R.songid IN ( SELECT guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s ) AND artist NOT LIKE %s GROUP BY title ORDER BY CT DESC LIMIT 10"
         params = (title, artist, artist)
 
         if self.isNotSet(artist):
             artist = '%'
             #we don't want to use the "artist not like" stipulation if there is no artist.
-            sql = "SELECT title, artist, album, S.guid, type, resource_id, COUNT(R2.songid) CT  FROM sp_relation R JOIN sp_relation R2 ON R.plid = R2.plid JOIN sp_songs S ON R2.songid = S.guid JOIN resource Re ON S.rid = Re.rid WHERE R.songid IN ( SELECT guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s ) GROUP BY title ORDER BY CT DESC LIMIT 10"
+            sql = "SELECT title, artist, album, S.guid, Re.type, resource_id, COUNT(R2.songid) CT  FROM sp_relation R JOIN sp_relation R2 ON R.plid = R2.plid JOIN sp_songs S ON R2.songid = S.guid JOIN resource Re ON S.rid = Re.rid WHERE R.songid IN ( SELECT guid FROM sp_songs WHERE title LIKE %s AND artist LIKE %s ) GROUP BY title ORDER BY CT DESC LIMIT 10"
             params = (title, artist)
         if self.isNotSet(title):
             title = '%'
