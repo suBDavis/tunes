@@ -303,6 +303,7 @@ var current_pl = function(){
   	var clicked = window.current_pld.rids[j]; 
   	var clickedRID = clicked.resourceid; 
  	var clickedType = clicked.songtype;
+	window.current_pld.pl.pointer=j; 
 	pl_manager.playIndex(clickedRID, clickedType);  
 }
 	this.skipSong = function(e) { 
