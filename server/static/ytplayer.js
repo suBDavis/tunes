@@ -35,7 +35,7 @@ function onPlayerStateChange(event) {
   //later we should check that the next song is actually a youtube song, and that we dont need to switch players here
   if (event.data == YT.PlayerState.ENDED) {
     //ytLoadSong(pl_manager.getNext())
-    pl_manager.onSongEnd();
+    pl_manager.loadSong();
   }
 }
 function stopVideo() {
@@ -51,9 +51,8 @@ function ytLoadSong(songid){
 var scplayer;
 //now initialize the soundcloud player
 function initializeSCPlayer(){
-//	return SC.Widget("scplayer"); 
   scplayer = SC.Widget("scplayer");
-  scplayer.bind(SC.Widget.Events.FINISH, pl_manager.onSongEnd); 
+  scplayer.bind(SC.Widget.Events.FINISH, pl_manager.loadSong); 
 }
 function scLoadSong(id){
   url = "http://api.soundcloud.com/tracks/" + id
@@ -71,14 +70,11 @@ function uniPlayer() {
 
   this.yt = null;
   this.sc = null;
-  this.isYouTubeReady = false;
-  this.isSoundCloudReady = false;
   this.currentSong = null;
   
   this.initializePlayer = function() {
 	  initializeSCPlayer();
 	  this.sc = scplayer;
-	  this.isSoundCloudReady = true; 
   }
   
   this.play = function() {
@@ -90,18 +86,15 @@ function uniPlayer() {
   }
   
   this.loadSong = function() { 
-	  if (this.isYouTubeReady && this.isSoundCloudReady) { 
-		  this.currentSong = window.current_pld.pl.getNext(); 
-		  if (this.currentSong.songtype == "youtube") {
-			  ytLoadSong(this.currentSong.resourceid); 
-		  } else { 
-			  scLoadSong(this.currentSong.resourceid); 
-		  }
-	  }
+	this.currentSong = window.current_pld.pl.getNext(); 
+    if (this.currentSong.songtype == "youtube") {
+		ytLoadSong(this.currentSong.resourceid); 
+	} else { 
+		scLoadSong(this.currentSong.resourceid); 
+	}
   }
 
   this.youtubeReady = function() { 
-	  this.isYouTubeReady = true; 
 	  this.yt = ytplayer; 
   }
   
@@ -119,12 +112,11 @@ function uniPlayer() {
 	  }
   }
 
-  this.pause = function(){
+ /* this.pause = function(){
     //todo
   }
   this.onSongEnd = function(){
     //decide what song comes next and how to load it.
-	  pl_manager.loadSong(); 
   }
   
   this.skip = function(){
@@ -133,7 +125,7 @@ function uniPlayer() {
   
   this.playerReady = function(){
     //move shit here.
-  }
+  }*/
   
   
 }
