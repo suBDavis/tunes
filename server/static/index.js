@@ -50,7 +50,7 @@ var current_pl = function(){
 	//this.tbdiv = $("#current-pl-td")
 	this.maxchars = 60;
 	this.pl = new playlist();
-	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small' id = 'mbtn'><i class='material-icons'>-</i></a>";
+	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small' id = 'mbtn'><i class='tiny material-icons'>-</i></a>";
 	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light red darken-1 b-small' id = 'ytplaybtn'><i class='tiny material-icons'>play_arrow</i></a>";
 	//waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>></i></a>";
 	this.skipbtn = "<a class = 'btn-floating waves-effect waves-light blue-grey darken-1 b-small' id = 'skipbtn'><i class = 'tiny material-icons'>fast_forward</i></a>"; 
