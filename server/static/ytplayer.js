@@ -94,7 +94,11 @@ function uniPlayer(){
   }
 
   this.pause = function(){
-
+    if (this.currentSong.songtype == 'youtube'){
+      this.youtube.pauseVideo();
+    } else {
+      this.soundcloud.pause();
+    }
   }
 
   this.songEnded = function(){
@@ -102,6 +106,8 @@ function uniPlayer(){
   }
 
   this.skip = function(){
+    this.pause();
+    this.loadSong();
   }
 
   //youtube functions
