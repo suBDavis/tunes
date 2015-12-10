@@ -85,6 +85,7 @@ var current_pl = function(){
 	}
 	
 	this.refreshplcheck = function(res){
+		console.log("current pointer is: "+window.current_pld.pl.pointer);
 		window.current_pld.refreshhtml(); //maybe try to not have this happen every time, although was super buggy that way for some reason
 		//console.log("in refresh pl check");
 		res = JSON.parse(res);
@@ -99,36 +100,42 @@ var current_pl = function(){
 			jmax = plist.length;
 		}
 		var changed = false;
+		var currentsong = jQuery.extend(true, {}, window.current_pld.pl.getCurrent());
+		var currentpoint = window.current_pld.pl.pointer;
+		var deletions=0;
 		for (var j=jmax-1; j>=0; j--){
 			if (changed){
 				var plist = current_pld.pl.plist;
 			}
-			console.log("j is: ");
-			console.log(j);
-			console.log("jmax is: ");
-			console.log(jmax);
-			console.log("plist[j]");
-			console.log(plist[j]);
-			console.log("res[j]");
-			console.log(res.pl_result[j]);
+			//console.log("j is: ");
+			//console.log(j);
+			//console.log("jmax is: ");
+			//console.log(jmax);
+			//console.log("plist[j]");
+			//console.log(plist[j]);
+			//console.log("res[j]");
+			//console.log(res.pl_result[j]);
 			if (res.pl_result.length <= j || plist.length <= j || plist[j] === undefined || res.pl_result[j]['rid'] != plist[j].resourceid || res.pl_result[j]['orderi'] != plist[j].orderi){
 				changed = true;
+				if (j<currentpoint){
+					deletions++;
+				}
 				if (res.pl_result.length <= j){
-					console.log("im in 1");
+					//console.log("im in 1");
 					window.current_pld.pl.remove(plist[j]);
 				} else if (plist.length <= j || plist[j] === undefined) {
 					var s = new song(res.pl_result[j]['songtype'],0,res.pl_result[j]['rid'],res.pl_result[j]['artist'],res.pl_result[j]['title'],res.pl_result[j]['orderi']);
 					//window.current_pld.addSongNodeOnly(s);
 					window.current_pld.pl.addplistidx(j,s);
 					window.current_pld.rids[song.orderi] = s;
-					console.log("im in 2");
+					//console.log("im in 2");
 				} else {
 					//console.log("plist[j] orderi");
 					//console.log(plist[j].orderi);
 					window.current_pld.pl.deletewithhole(plist[j]);
 					var s = new song(res.pl_result[j]['songtype'],0,res.pl_result[j]['rid'],res.pl_result[j]['artist'],res.pl_result[j]['title'],res.pl_result[j]['orderi']);
 					//window.current_pld.addSongNodeOnly(s);
-					console.log("im in 3");
+					//console.log("im in 3");
 					window.current_pld.pl.addplistidx(j,s);
 					window.current_pld.rids[song.orderi] = s;
 				}
@@ -138,6 +145,7 @@ var current_pl = function(){
 		if (changed){
 			window.current_pld.refreshhtml();
 			changed = false;
+			window.current_pld.pl.setPointToSong(currentsong,deletions);
 		}
 	}
 	

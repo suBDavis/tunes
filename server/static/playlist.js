@@ -16,16 +16,20 @@ var playlist = function(){
 	}
 	
 	
-	this.setPointToSong(song, ndeletedbefore){ //when updating playlist from sync: index.js stores what song was current before the update, then this function checks to see if that song is still in the playlist and if so sets the point to it; if it's not still in the playlist, it sets the pointer to the current pointer minus the number of songs deleted before the current pointer
-		var exists=false;
+	this.setPointToSong=function(song, ndeletedbefore){ //when updating playlist from sync: index.js stores what song was current before the update, then this function checks to see if that song is still in the playlist and if so sets the point to it; if it's not still in the playlist, it sets the pointer to the current pointer minus the number of songs deleted before the current pointer
+		var exists=false; //flag - the song doesn't exist
 		for (var i=0;i<this.plist.length;i++){ 
 			if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi===song.orderi){ 
 				this.pointer=i;
-				exists=true;
+				exists=true;//change flag - the song exists and pointer has been set to its position
 			}
 		}
-		if (!exists){
-			this.pointer = this.pointer-ndeletedbefore;
+		if (!exists){ //currently playing song doesn't exist - it's been deleted
+			if (this.pointer-ndeletedbefore > 0){
+				this.pointer = this.pointer-ndeletedbefore; //pointer = current point minus the number of songs that were deleted before the location of the current pointer
+			} else {
+				this.pointer=0; //if pointer value under previous conditions would somehow be negative (i dont think thats possible but im just bein safe) just set it to 0
+			}
 		}
 		
 	}
@@ -40,7 +44,7 @@ var playlist = function(){
         if(this.plist.length <= 1){
             //we added the first song.  Let the playing begin!
             ytLoadSong(this.plist[this.pointer].resourceid);
-            this.pointer++;
+            //this.pointer++;
         }
 		this.plist = this.plist.filter(function(){return true;});
     }
@@ -78,7 +82,7 @@ var playlist = function(){
 				delete this.plist[i];
 			}
 		}
-	}d
+	}
 	
 	this.setplid = function(newplid){
 		this.plid=newplid;
