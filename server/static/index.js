@@ -418,13 +418,14 @@ function updateSearch(){
   }
 }
 
+
 function generateResults(e){
   window.top_searchbar.hide();
   //set search to the thing.
   var divid = e.target.id;
   var target = window.top_searchbar.find(divid);
-  var artist;
-  var title;
+  var artist = target.artist;
+  var title = target.title;
   var searchterms = $("#search").val();
   if (divid =="sc"){
     artist = searchterms;
@@ -433,9 +434,10 @@ function generateResults(e){
   } else if(divid == 'yt'){
     artist = searchterms;
     title = ""
-  } else {
-    artist = target.artist == "" ? "--none--" : target.artist;
-    title = target['title'] == "" ? "--none--" : target['title']
+  } 
+  if (artist == "" || title == ""){
+    artist = artist == "" ? "--none--" : artist;
+    title = title == "" ? "--none--" : title
     window.top_searchbar.set(e.target.innerHTML);
     searchterms = e.target.innerHTML;
   }
@@ -633,7 +635,7 @@ function results(tagid){
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist  +"</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
     this.show();
