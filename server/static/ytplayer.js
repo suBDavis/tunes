@@ -59,3 +59,24 @@ function scLoadSong(id){
   options = {"show_artwork" : false};
   scplayer.load(url, options);
 }
+
+// ====================================
+// ======== Universal Player ==========
+// ====================================
+ var uniplayer;
+
+function uniPlayer(){
+  
+  this.play = function(){
+  }
+
+  this.pause = function(){
+  }
+
+  this.songEnded = function(){
+  }
+
+  this.skip = function(){
+  }
+
+ }
