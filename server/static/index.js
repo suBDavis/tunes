@@ -145,7 +145,7 @@ var current_pl = function(){
 		if (changed){
 			window.current_pld.refreshhtml();
 			changed = false;
-			window.current_pld.pl.setPointToSong(currentsong,deletions);
+			//window.current_pld.pl.setPointToSong(currentsong,deletions);
 		}
 	}
 	
