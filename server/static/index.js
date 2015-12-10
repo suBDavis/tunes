@@ -162,8 +162,8 @@ function generateResults(e){
   //set search to the thing.
   var divid = e.target.id;
   var target = window.top_searchbar.find(divid);
-  var artist;
-  var title;
+  var artist = target.artist;
+  var title = target.title;
   var searchterms = $("#search").val();
   if (divid =="sc"){
     artist = searchterms;
@@ -172,9 +172,10 @@ function generateResults(e){
   } else if(divid == 'yt'){
     artist = searchterms;
     title = ""
-  } else {
-    artist = target.artist == "" ? "%25" : target.artist;
-    title = target['title'] == "" ? "%25" : target['title']
+  } 
+  if (artist == "" || title == ""){
+    artist = artist == "" ? "--none--" : artist;
+    title = title == "" ? "--none--" : title
     window.top_searchbar.set(e.target.innerHTML);
     searchterms = e.target.innerHTML;
   }
@@ -217,6 +218,20 @@ function generateResults(e){
     }
     window.searchr.updateYT();
   });
+  //look for sugestions ONLY IF there is a title.  Otherwise the query will take too long
+  if(title != "--none--"){
+    ajax("/api/suggestions/artist/" + artist + "/title/" + title, function(res){
+      //callback for when the ajax completes
+      res = JSON.parse(res)
+      for (var i=0;i<res.suggestions.length;i++){
+        var sdata = res.suggestions[i];
+        //create ubiquitous song object
+        var recommended_song = new song(sdata.type, sdata.guid, sdata.resource_id, sdata.artist, sdata.title);
+        window.searchr.addItem(recommended_song, "rec");
+      }
+      window.searchr.updateRecommended();
+    });
+  }
 }
 
 function searchSC(terms, callbacksc){
@@ -246,7 +261,7 @@ function searchbar(tagid){
   this.updateDisplay = function(){
     this.search_id.empty();
     for(var i = 0; i<this.list.length; i++){
-      var newli = $("<a href='#" +this.list[i]["classtype"]+ "' id="+this.list[i]["divid"]+" class='collection-item "+this.list[i]["classtype"]+"'>"+ this.list[i]["artist"] + " " + this.list[i]['title'] + "</a>");
+      var newli = $("<a href='javascript:;' id="+this.list[i]["divid"]+" class='collection-item "+this.list[i]["classtype"]+"'>"+ this.list[i]["artist"] + " " + this.list[i]['title'] + "</a>");
       this.search_id.append(newli);
     }
   }
@@ -271,19 +286,20 @@ function searchbar(tagid){
 //escape key should close the search bar
 //clicking outside search should close search bar
 //I haven't done that yet.
-
 function results(tagid){
   this.div = $("#search-results-table");
   this.tagid = tagid;
   this.list = [];
   this.sclist = [];
-  this.scdiv = $("#sc-results-table")
+  this.scdiv = $("#sc-results-table");
   this.ytlist = [];
-  this.ytdiv = $("#yt-results-table")
+  this.ytdiv = $("#yt-results-table");
+  this.reclist = [];
+  this.recdiv = $("#rec-results-table");
   this.maxchars = 60;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
-
+  
   this.addItem = function(dict_item, type){
     //console.log(dict_item);
     if (type == "sc"){
@@ -291,6 +307,9 @@ function results(tagid){
       this.sr[dict_item.resourceid] = dict_item;
     }else if (type=="yt"){
       this.ytlist.push(dict_item);
+      this.sr[dict_item.resourceid] = dict_item;
+    }else if(type=="rec"){
+      this.reclist.push(dict_item);
       this.sr[dict_item.resourceid] = dict_item;
     }else {
       this.list.push(dict_item);
@@ -321,6 +340,22 @@ function results(tagid){
       window.searchr.clickEvent(e);
     });
   }
+  this.updateRecommended = function(){
+    var l = this.reclist;
+    this.reclist = [];
+    this.recdiv.empty();
+    //console.log(l);
+    //console.log(this.list);
+    for(var i=0;i<l.length;i++){
+      var a = l[i];
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) + "</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) + "</td><td class='c'>"+this.bnode+"</td></tr>";
+      this.recdiv.append(newnode);
+    }
+    this.show();
+    $("#rec-results-table a").on('click',function(e){
+      window.searchr.clickEvent(e);
+    });
+  }
   this.updateSC = function(){
     var l = this.sclist;
     //console.log(l);
@@ -328,7 +363,7 @@ function results(tagid){
     this.scdiv.empty();
     for(var i=0;i<l.length;i++){
       var a = l[i];
-      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist.substring(0 , this.maxchars) +"</td><td class='b'>" + a['songtitle'].substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
+      var newnode = "<tr id='"+a.resourceid+"'><td class='a'>" + a.artist  +"</td><td class='b'>" + a.songtitle.substring(0 , this.maxchars) +  "</td><td class='c'>"+this.bnode+"</td></tr>";
       this.scdiv.append(newnode);
     }
     this.show();
@@ -368,5 +403,6 @@ function results(tagid){
     this.scdiv.show();
     this.ytdiv.show();
     this.div.show();
+    this.recdiv.show();
   }
 }

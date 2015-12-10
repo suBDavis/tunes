@@ -109,6 +109,11 @@ function uniPlayer(){
     this.pause();
     this.loadSong();
   }
+  this.back = function(){
+    this.pause();
+    pl_manager.pointer--;
+    this.loadSong();
+  }
 
   //youtube functions
   this.alertYoutubeReady = function(){
