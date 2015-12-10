@@ -13,8 +13,8 @@ var playlist = function(){
 
         if(this.plist.length == 1){
             //we added the first song.  Let the playing begin!
-            ytLoadSong(this.plist[this.pointer]);
-            this.pointer++;
+            //Tell the player that we have a song, and let the player decide when to play it if it's ready
+            uniplayer.loadSong();
         }
     }
 }

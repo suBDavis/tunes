@@ -5,7 +5,7 @@
 var baseurl = "http://localhost:5000"
 
 // this is set from initialize() where we instantiate the playlist.js playlist object
-var pl_manager = null; 
+var pl_manager = new playlist();
 
 //-------------------------------------------
 // Song object that is ambuguous to source 
@@ -30,7 +30,7 @@ function onAdd(song_meta){
 
   console.log(song_meta);//here's whats inside.
 
-  // playlist.append(song_meta);
+  pl_manager.append(song_meta);
 
   // the playlist object is in playlist.js (same folder)
   // the youtube player is in ytplayer.js
@@ -76,7 +76,8 @@ function initialize(){
       client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
     });
 
-    initializeSCPlayer();
+    uniplayer = new uniPlayer();
+    uniplayer.init();
 }
 
 //========================================

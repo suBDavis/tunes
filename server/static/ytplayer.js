@@ -8,8 +8,6 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 //    after the API code downloads.
 var ytplayer;
 
-var pl_manager = new playlist();
-
 function onYouTubeIframeAPIReady() {
   ytplayer = new YT.Player('player', {
     height: '390',
@@ -24,9 +22,8 @@ function onYouTubeIframeAPIReady() {
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
-  //I'll deal with this later.
-  //event.target.playVideo();
-  //pl_manager.append("string");
+  //tell the universal player that the youtube player is ready.
+  uniplayer.alertYoutubeReady();
 }
 // 5. The API calls this function when the player's state changes.
 //    The function indicates that when playing a video (state=1),
@@ -36,7 +33,9 @@ function onPlayerStateChange(event) {
   //play the next song in the playlist queue if the current one is over.
   //later we should check that the next song is actually a youtube song, and that we dont need to switch players here
   if (event.data == YT.PlayerState.ENDED) {
-    ytLoadSong(pl_manager.getNext())
+    //ytLoadSong(pl_manager.getNext())
+    //tell the uniplayer that a song has ended and it should take action
+    uniplayer.songEnded();
   }
 }
 function stopVideo() {
@@ -49,34 +48,72 @@ function ytLoadSong(songid){
 // ====================================
 // ========Soundcloud Player===========
 // ====================================
-var scplayer;
-//now initialize the soundcloud player
 function initializeSCPlayer(){
-  scplayer = SC.Widget("scplayer");
-}
-function scLoadSong(id){
-  url = "http://api.soundcloud.com/tracks/" + id
-  options = {"show_artwork" : false};
-  scplayer.load(url, options);
+  return SC.Widget("scplayer");
 }
 
 // ====================================
 // ======== Universal Player ==========
 // ====================================
- var uniplayer;
+var uniplayer;
 
 function uniPlayer(){
+  this.currentSong = null;
+  this.youtube = null;
+  this.soundcloud = null;
+
+  //youtube specific variables
+  this.youtubeReady = false;
+  this.soundcloudReady = false;
+
+  this.init = function(){
+    this.soundcloud = initializeSCPlayer();
+    this.soundcloudReady = true;
+    this.soundcloud.bind(SC.Widget.Events.FINISH, this.songEnded);
+  }
   
   this.play = function(){
+    if (this.currentSong.songtype == 'youtube'){
+      this.youtube.playVideo();
+    } else {
+      this.soundcloud.play();
+    }
+  }
+  this.loadSong = function(){
+    if (this.youtubeReady && this.soundcloudReady){
+      //play whatever's in the queue
+      this.currentSong = pl_manager.getNext();
+      if (this.currentSong.songtype == 'youtube'){
+        //youtube song 
+        ytLoadSong(this.currentSong.resourceid);
+      } else {
+        this.scLoadSong(this.currentSong.resourceid);
+      }
+    }
   }
 
   this.pause = function(){
+
   }
 
   this.songEnded = function(){
+    uniplayer.loadSong();
   }
 
   this.skip = function(){
   }
 
- }
+  //youtube functions
+  this.alertYoutubeReady = function(){
+    this.youtubeReady = true;
+    this.youtube = ytplayer;
+  }
+
+  //soundcloud functions
+  this.scLoadSong = function(id){
+    url = "http://api.soundcloud.com/tracks/" + id
+    options = {"show_artwork" : false};
+    this.soundcloud.load(url, options);
+  }
+
+}
