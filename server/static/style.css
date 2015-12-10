@@ -51,8 +51,8 @@
   }*/
 
 .material-icons {
-	font-size:1rem important!;
-	/*margin:auto;*/
+	margin-top:0.22rem !important;
+	font-size:1rem !important;
 }
  
 td.a {
