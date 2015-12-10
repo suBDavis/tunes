@@ -2,8 +2,8 @@ var playlist = function(){
 	this.plid=0; //starts at 0 
     this.plist = [];
     this.pointer = 0;
-	this.pointer2 = 0; 
-
+	this.pointer2 = 0;
+	
     this.getNext = function(){
         //return the next song and increment the playlist pointer
         var ret = this.plist[this.pointer+1];
@@ -77,10 +77,18 @@ var playlist = function(){
 	}
 	
 	this.deletewithhole = function(song){
+		this.plist=this.plist.clean(undefined);
 		for (var i=0;i<this.plist.length;i++){
-			if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi===song.orderi){ 
-				delete this.plist[i];
-			}
+			//try{
+				if (this.plist[i].resourceid===song.resourceid && this.plist[i].orderi===song.orderi){ 
+					delete this.plist[i];
+					break;
+				}
+				//}
+			//catch(err){
+				 //get rid of undefined values
+			//	this.deletewithhole();
+			//}
 		}
 	}
 	
@@ -105,4 +113,14 @@ var playlist = function(){
 		this.plist = this.plist.filter(function(){return true;});
     }
 	
+};
+
+Array.prototype.clean = function(deleteValue) { //to delete the deleteValue - used with undefined to fix this random bug that im still confused by so rather than finding the source im doing a questionable solution
+  for (var i = 0; i < this.length; i++) {
+    if (this[i] == deleteValue) {         
+      this.splice(i, 1);
+      i--;
+    }
+  }
+  return this;
 };
