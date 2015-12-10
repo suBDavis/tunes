@@ -6,13 +6,11 @@ var playlist = function(){
 	
     this.getNext = function(){
         //return the next song and increment the playlist pointer
-        var ret = this.plist[this.pointer+1];
-        return ret;
+    	 return this.plist[this.pointer++]; 
     }
 	
 	this.getCurrent = function() { 
 		return this.plist[this.pointer]; 
-		//this.pointer2++; 
 	}
 	
 	
@@ -40,22 +38,12 @@ var playlist = function(){
         this.plist.push(song);
 		//console.log("appended to plist");
 		//console.log(this.plist[0]);
-
-        if(this.plist.length <= 1){
-            //we added the first song.  Let the playing begin!
-            ytLoadSong(this.plist[this.pointer].resourceid);
-            //this.pointer++;
-        }
+		if (this.plist.length == 1) { 
+			pl_manager.loadSong(); 
+			pl_manager.play();
+		}
 		this.plist = this.plist.filter(function(){return true;});
     }
-	
-	this.appendYTRID = function(resID) {
-		this.plist.push(resID); 
-		if (this.plist.length >= 1) { 
-			ytCuePlaylist(this.plist); 
-		}
-        this.pl_changed();
-	}
 	
 	this.addplistidx=function(j,s){
 		this.plist[j]=s;

@@ -5,10 +5,7 @@
  var baseurl = "http://localhost:5000"
 
 // this is set from initialize() where we instantiate the playlist.js playlist object
-var pl_manager = null; 
-var currentYTSongs = null;
-var currentYTSongsRIDs = null; 
-var ytRIDptr = 0; 
+ var pl_manager;
 
 //-------------------------------------------
 // Song object that is ambuguous to source 
@@ -53,12 +50,10 @@ var current_pl = function(){
 	//this.tbdiv = $("#current-pl-td")
 	this.maxchars = 60;
 	this.pl = new playlist();
-	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>-</i></a>";
-	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>></i></a>";
+	this.mbtn = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small' id = 'mbtn'><i class='material-icons'>-</i></a>";
+	this.ytplaybtn = "<a class='btn-floating waves-effect waves-light red darken-1 b-small' id = 'ytplaybtn'><i class='material-icons'>></i></a>";
+	//waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>></i></a>";
 	this.rids = {};
-	this.ytSongs = new playlist(); 
-	this.ytRIDs = new playlist();
-	//this.ytRIDptr = 0; 
 	this.subplid = 0;
 	this.enter_pl = $("#current-pl-form");
 	this.lastorderi;
@@ -163,6 +158,9 @@ var current_pl = function(){
 	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
+		$("#current-pl #ytplaybtn").off().on('click', function(e) {
+			window.current_pld.playSong(e);
+		}); 
 	}
 	
 	this.loadpl=function(res){
@@ -238,6 +236,9 @@ var current_pl = function(){
 	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
+		$("#current-pl #ytplaybtn").off().on('click', function(e) {
+			window.current_pld.playSong(e);
+		}); 
 		console.log(s);
 		console.log(this.rids);
 	}
@@ -263,6 +264,9 @@ var current_pl = function(){
 	    $("#current-pl a").off().on('click',function(e){
 	      window.current_pld.clickEvent(e);
 		});
+		$("#ytplaybtn").off().on('click', function(e) {
+			window.current_pld.playSong(e);
+		}); 
 	}
 	
     this.clickEvent = function(e){
@@ -276,6 +280,14 @@ var current_pl = function(){
 	  this.dbremove(clicked);
 	  console.log(clicked);	  
   }
+  
+	this.playSong = function(e) {
+  	var j = $(e.target).closest("tr").attr("id"); 
+  	var clicked = window.current_pld.rids[j]; 
+  	var clickedRID = clicked.resourceid; 
+ 	var clickedType = clicked.songtype;
+	pl_manager.buttonClicked(clickedRID, clickedType);  
+}
   
   this.dbremove=function(song){
 	  console.log("im in dbremove with song order:");
@@ -348,13 +360,13 @@ function ajax(url, callback) {
 //here's the entry point for the JS file
 //---------------------------------------
 function initialize(){
-  window.top_searchbar = new searchbar("search-ajax");
-  window.searchr = new results("search-results-table"); 
-	window.current_pld = new current_pl("current-pl");
+    window.top_searchbar = new searchbar("search-ajax");
+    window.searchr = new results("search-results-table"); 
+    window.current_pld = new current_pl("current-pl");
 	//window.current_pl = new pl_div();
-  pl_manager = new playlist();
-	currentYTSongs = current_pld.ytSongs;
-	currentYTSongsRIDs = current_pld.ytRIDs;
+	pl_manager = new uniPlayer();  
+	pl_manager.initializePlayer(); 
+ 
    
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });

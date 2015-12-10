@@ -8,18 +8,11 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 //    after the API code downloads.
 var ytplayer;
 
-var pl_manager = new playlist();
-
 function onYouTubeIframeAPIReady() {
-  //TODO : make this universal
   ytplayer = new YT.Player('player', {
     height: '390',
     width: '640',
-	videoID: current_pld.ytRIDs[ytRIDptr],
-	//videoId: currentYTSongs.getNext(),
-	  //pl_manager.getNext(),
-	  //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
-
+    videoId: null, //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
     events: {
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange
@@ -29,12 +22,10 @@ function onYouTubeIframeAPIReady() {
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
-  //I'll deal with this later.
-  event.target.playVideo();
-  //see if there is a playlist already waiting to be queued.
-  loadPLID( $("#initial_plid")[0].innerHTML);
-  //pl_manager.append("string");
+  pl_manager.youtubeReady();
 }
+
+
 // 5. The API calls this function when the player's state changes.
 //    The function indicates that when playing a video (state=1),
 //    the player should play for six seconds and then stop.
@@ -43,23 +34,15 @@ function onPlayerStateChange(event) {
   //play the next song in the playlist queue if the current one is over.
   //later we should check that the next song is actually a youtube song, and that we dont need to switch players here
   if (event.data == YT.PlayerState.ENDED) {
-	 // console.log(currentYTSongsRIDs.getCurrent()); 
-	 // console.log(currentYTSongsRIDs.getNext());
-	 var nextSongRID = current_pld.ytRIDs[ytRIDptr];
-   // console.log(nextSongRID); 
-   // ytLoadSong(nextSongRID); 
+    //ytLoadSong(pl_manager.getNext())
+    pl_manager.onSongEnd();
   }
 }
 function stopVideo() {
   ytplayer.stopVideo();
 }
-
-function ytLoadSong(resourceid){
-  ytplayer.loadVideoById({'videoId': resourceid});
-}
-
-function ytCuePlaylist(plist){
-  ytplayer.cuePlaylist({'playlist' : plist}); 
+function ytLoadSong(songid){
+  ytplayer.loadVideoById({'videoId': songid});
 }
 
 // ====================================
@@ -68,40 +51,70 @@ function ytCuePlaylist(plist){
 var scplayer;
 //now initialize the soundcloud player
 function initializeSCPlayer(){
+//	return SC.Widget("scplayer"); 
   scplayer = SC.Widget("scplayer");
+  scplayer.bind(SC.Widget.Events.FINISH, pl_manager.onSongEnd); 
 }
 function scLoadSong(id){
   url = "http://api.soundcloud.com/tracks/" + id
-  options = {"show_artwork" : false};
+  options = {"show_artwork":false, "auto_play":true};
   scplayer.load(url, options);
-}
+} 
 // ====================================
 // ======== Universal Player ==========
 // ====================================
 // ......always use this.
 
-// var player;
+var pl_manager; 
 
-function initializePlayer(){
-  //get soundcloud ready
-  initializeSCPlayer();
-  //create the universal player
-  player = new uniPlayer(ytplayer, scplayer);
-}
+function uniPlayer() {
 
-function uniPlayer(youtube, soundcloud){
-  this.currentMode = "yt";
-  this.yt = youtube;
-  this.sc = soundcloud;
-  //this player will also use pl_manager
-
-  this.play = function(){
-    if(this.mode == "yt"){
+  this.yt = null;
+  this.sc = null;
+  this.isYouTubeReady = false;
+  this.isSoundCloudReady = false;
+  this.currentSong = null;
+  
+  this.initializePlayer = function() {
+	  initializeSCPlayer();
+	  this.sc = scplayer;
+	  this.isSoundCloudReady = true; 
+  }
+  
+  this.play = function() {
+    if(this.currentSong.songtype == "youtube"){
       this.yt.playVideo();
-    }
-    else{
+    } else {
       this.sc.play();
     }
+  }
+  
+  this.loadSong = function() { 
+	  if (this.isYouTubeReady && this.isSoundCloudReady) { 
+		  this.currentSong = window.current_pld.pl.getNext(); 
+		  if (this.currentSong.songtype == "youtube") {
+			  ytLoadSong(this.currentSong.resourceid); 
+		  } else { 
+			  scLoadSong(this.currentSong.resourceid); 
+		  }
+	  }
+  }
+
+  this.youtubeReady = function() { 
+	  this.isYouTubeReady = true; 
+	  this.yt = ytplayer; 
+  }
+  
+  this.buttonClicked = function(id, type) {
+	  stopVideo(); 
+	  this.sc.pause(); 
+	  this.resourceid = id; 
+	  this.resourcetype = type; 
+	  if (this.resourcetype == "youtube") { 
+		  ytLoadSong(this.resourceid);  
+	  } else { 
+		  scLoadSong(this.resourceid);  
+	  }
   }
 
   this.pause = function(){
@@ -109,27 +122,16 @@ function uniPlayer(youtube, soundcloud){
   }
   this.onSongEnd = function(){
     //decide what song comes next and how to load it.
+	  pl_manager.loadSong(); 
   }
+  
   this.skip = function(){
     //what do we do if skip is pressed?
   }
-  this.playIndexFromPlaylist = function(index){
-    //what to do if a user clicks play on a particular song in the PL
-  }
-  this.playerReady=function(){
+  
+  this.playerReady = function(){
     //move shit here.
   }
+  
+  
 }
-
-function ytCueSong(resourceid) {
-  player.cueVideoById({'videoId': resourceid});
-}
-
-/*function ytLoadSong(resourceid) {
-  player.loadVideoById({'videoId' : resourceid}); 
-}
-
-function ytCuePlaylist(plist){
-	player.cuePlaylist({'playlist' : plist}); 
-}
-*/
