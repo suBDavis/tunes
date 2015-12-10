@@ -6,11 +6,15 @@ config = Config()
 app = Flask(__name__)
 CORS(app)
 sql = SQL(config)
-yt = Youtube()
+yt = Youtube(config)
 
 @app.route("/")
 def index():
-    return render_template('index.html', id=config.getVersion())
+    return render_template('index.html', id=config.getVersion(), plid="")
+
+@app.route("/<plid>")
+def indexwithplid(plid):
+    return render_template('index.html', id=config.getVersion(), plid=plid)
 
 @app.route("/api")
 def hello():
@@ -43,16 +47,23 @@ def search(terms):
 
 @app.route("/api/search/artist/<artist>/title/<title>")
 def finiteSearch(artist, title):
+    # artist = artist.replace("--none--" , '%')
+    # title = title.replace("--none--", '%')
     return jsonify(sql.finiteSearch(artist, title))
 
 @app.route("/api/ytsearch/video/<query>")
 def ytsearch(query):
+    query = query.replace("--none--", "")
     options = YTparam()
     setattr(options, 'q' , query)
     setattr(options, 'max_results' , 10)
     setattr(options, 'type' , 'video')
     response = yt.youtube_search(options)
     return jsonify(response)
+
+@app.route("/api/suggestions/artist/<artist>/title/<title>")
+def suggestions(artist, title):
+    return jsonify(sql.correlation(artist, title))
 
 #-------------------
 # Playlist-related queries - currently unimplemented
@@ -74,8 +85,12 @@ def removeFromPL(plid):
     #since this is a delete, we can assume the client wants to remove a track.
     #because the track must already be in the DB, we only need songid and plid
     song_id = request.form['song_id']
+    #print(song_id)
+    order = request.form['orderi']
+    #print(order)
     playlist_id = plid  
-    return jsonify(sql.removeFromPL(song_id, playlist_id))
+    #print(plid)
+    return jsonify(sql.removeFromPL(song_id, order, playlist_id))
 
 @app.route("/api/playlist/<plid>", methods=['GET'])
 def getPL(plid):

@@ -3,10 +3,35 @@
 // Developing Locally?  Swap the comments here and start the python server.
 // var baseurl = "http://tunes.redspin.net"
 var baseurl = "http://localhost:5000"
-
 // this is set from initialize() where we instantiate the playlist.js playlist object
 var pl_manager = new playlist();
 
+//---------------------------------------
+//here's the entry point for the JS file
+//---------------------------------------
+$(document).ready(function() {
+    // Page is ready.  run this code.
+    //this is the entry point for our javascript
+    initialize();
+    console.log("js ready");
+});
+function initialize(){
+    window.top_searchbar = new searchbar("search-ajax");
+    window.searchr = new results("search-results-table"); 
+    //pl_manager was already initialized
+   
+    //register listener for search box.
+    $("#search").on('input', function(){ updateSearch(); });
+    $("#search-ajax").on('click', function(e){ generateResults(e); });
+   
+    //Let's create a soundcloud API connection
+    SC.initialize({
+      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
+    });
+
+    uniplayer = new uniPlayer();
+    uniplayer.init();
+}
 //-------------------------------------------
 // Song object that is ambuguous to source 
 //-------------------------------------------
@@ -27,14 +52,51 @@ function onAdd(song_meta){
   //it might not have a songid.  If it doesn't, this means the song is not in our database yet (it came from yt or sc)
   //basically the  youtube and soundcloud players will need to have access to a universal playlist (pl_manager currently)
   //that playlist will have a collection of songs that have the same attributes no matter where we got them from.
-
   console.log(song_meta);//here's whats inside.
   pl_manager.append(song_meta);
-
 }
-
 //------------------------------------------
-// Ajax requests can use this helper method.  Pass it a callback for what you want it to do with your results
+// Ajax DELETE
+//------------------------------------------
+function ajax_delete(url, deleteinfo, callback) { 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+     //console.log("workd" + xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      console.log("AJAX returned server error.")
+     } else {
+      callback(xhttp.responseText);
+     }
+    }
+  };
+  xhttp.open("DELETE", baseurl + url, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send(deleteinfo);
+}
+//------------------------------------------
+// Ajax POST
+//------------------------------------------
+function ajax_post(url, postinfo, callback) { 
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+     //console.log("workd" + xhttp.responseText);
+     var rtext = JSON.parse(xhttp.responseText);
+     if(rtext['error']){
+      console.log("AJAX returned server error.")
+     } else {
+      callback(xhttp.responseText);
+     }
+    }
+  };
+  xhttp.open("POST", baseurl + url, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send(postinfo);
+}
+//------------------------------------------
+// Ajax GET
 //------------------------------------------
 function ajax(url, callback) { 
   var xhttp = new XMLHttpRequest();
@@ -43,9 +105,7 @@ function ajax(url, callback) {
      //console.log("workd" + xhttp.responseText);
      var rtext = JSON.parse(xhttp.responseText);
      if(rtext['error']){
-      ajax("/api/mysql" , function(){
-        ajax(url, callback);
-      });
+      console.log("AJAX returned server error.")
      } else {
       callback(xhttp.responseText);
      }
@@ -53,27 +113,6 @@ function ajax(url, callback) {
   };
   xhttp.open("GET", baseurl + url, true);
   xhttp.send();
-}
-
-//---------------------------------------
-//here's the entry point for the JS file
-//---------------------------------------
-function initialize(){
-    window.top_searchbar = new searchbar("search-ajax");
-    window.searchr = new results("search-results-table"); 
-    //pl_manager was already initialized
-   
-    //register listener for search box.
-    $("#search").on('input', function(){ updateSearch(); });
-    $("#search-ajax").on('click', function(e){ generateResults(e); });
-   
-    //Let's create a soundcloud API connection
-    SC.initialize({
-      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
-    });
-
-    uniplayer = new uniPlayer();
-    uniplayer.init();
 }
 
 //========================================
@@ -187,13 +226,6 @@ function searchSC(terms, callbacksc){
     callbacksc(tracks);
   });
 }
-
-$(document).ready(function() {
-    // Page is ready.  run this code.
-    //this is the entry point for our javascript
-    initialize();
-    console.log("js ready");
-});
 
 function searchbar(tagid){
   this.search_id = $("#" + tagid);
