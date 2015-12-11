@@ -83,7 +83,6 @@ function uniPlayer(){
   this.loadSong = function(){
     if (this.youtubeReady && this.soundcloudReady){
       //play whatever's in the queue
-      this.currentSong = pl_manager.getNext();
       if (this.currentSong.songtype == 'youtube'){
         //youtube song 
         ytLoadSong(this.currentSong.resourceid);
@@ -102,17 +101,22 @@ function uniPlayer(){
   }
 
   this.songEnded = function(){
+    uniplayer.currentSong = pl_manager.getNext();
     uniplayer.loadSong();
   }
 
   this.skip = function(){
     this.pause();
+    this.currentSong = pl_manager.getNext();
     this.loadSong();
   }
   this.back = function(){
     this.pause();
-    pl_manager.pointer--;
+    this.currentSong = pl_manager.getPrevious();
     this.loadSong();
+  }
+  this.setCurrentSong=function(song){
+    this.currentSong = song;
   }
 
   //youtube functions

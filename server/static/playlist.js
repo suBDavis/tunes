@@ -5,7 +5,8 @@ var playlist = function(){
 
     this.getNext = function(){
         //return the next song and increment the playlist pointer
-        return this.plist[this.pointer++];
+        this.pointer+=1;
+        return this.plist[this.pointer];
     }
     this.append = function(song){
         //push to the end of the array list
@@ -15,13 +16,30 @@ var playlist = function(){
         if(this.plist.length == 1){
             //we added the first song.  Let the playing begin!
             //Tell the player that we have a song, and let the player decide when to play it if it's ready
+            uniplayer.setCurrentSong(song)
+
             uniplayer.loadSong();
             uniplayer.play();
         }
+        
         this.disp.update();
     }
     this.getAll = function(){
         return this.plist;
+    }
+
+    this.getCurrent = function(){
+        return this.plist[this.pointer];
+    }
+
+    this.getPrevious = function(){
+        //have to move pointer back 2 to the previous song.
+        if(this.pointer == 0){
+            return this.plist[0];
+        } else {
+            this.pointer-=1;
+            return this.plist[this.pointer];
+        }
     }
 }
 
