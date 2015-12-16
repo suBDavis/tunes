@@ -106,7 +106,9 @@ class SQL:
     #this section manages playlist stuff
 
     def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
-        return ''.join(random.choice(chars) for _ in range(size))
+        #return ''.join(random.choice(chars) for _ in range(size))
+        #put everything in the same playlist so I can purge it all later.
+        return "TEMPPL"
         
     def addToPL(self, songtype, resourceID, title, artist, plid):
         
@@ -122,46 +124,30 @@ class SQL:
         #   reason being, the sp_playlists table is just too damn big and we don't want to corrupt or screw it up.
         #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
         
-        #JS playlist id == 0 --> just created, doesn't exist yet
-        #print (plid)
-        #print("in add to pl")
-        orderi=1
-        if plid == '0':
-            #sql = "SELECT UUID()"
-            #params=None
-            #result = self.query(sql, params)
-            #plid = result[0]
-            plid = self.id_generator()   #TODO: check if this has been used before
-            #print (plid)
-            sql = "INSERT INTO playlists (plid, name) VALUES (%s, %s)"
-            params = (plid, 'New Playlist') 
-            #sql = "select guid from sp_playlists where name=%s"
-            #params = ('rainy weather',)
-            result = self.query(sql, params)
-            #print(result)
-        else:
-            sql= "SELECT MAX(orderi) FROM relation WHERE plid=%s"
-            params=(plid)
-            result = self.query(sql, params)
-            #print (result)
+        #See if the song needs to be added to songs
+        findSong = "SELECT guid FROM sp_songs WHERE rid = (SELECT rid  FROM resource R WHERE resource_id = %s AND R.type = %s);"
+        params = (resourceID, songtype)
+        result = self.query(findSong, params)
+        
+        if len(result) == 0:
+            #add it to resource
+            insertResource = "INSERT INTO resource (resource_id, type) VALUES (%s, %s);"
+            params = (resourceID, songtype)
+            result = self.query(insertResource, params)
+
+            #insert in sp_songs
+            insertSong = "INSERT INTO sp_songs (guid, artist, title, album, rid) VALUES (%s, %s, %s, %s, %s);"
+            params = (resourceID, artist, title, "na", self.connection.cursor().lastrowid)
+            result = self.query(insertSong, params)
             
-            #ok now get the max orderi out of the result in the worst possible way possible
-            
-            res=str(result[0])
-            #print(res)
-            i=len(res)-17;
-            #print(i)
-            res=res[16:(16+i)]
-            #print(res)
-            if (res != "None"):
-                orderi=int(float(res))+1
-                #print(orderi)
-            #print(res)
-            
-        sql = "INSERT INTO relation (plid, rid, songtype, title, artist, orderi) VALUES (%s, %s, %s, %s, %s, %s)"
-        params = (plid, resourceID, songtype, title, artist, orderi)
-        result = self.query(sql, params)
-        return {'plid' : plid, 'orderi' : orderi} 
+        #Now put it in the playlist.
+        #logic for playlist location.
+        #get max index then add one on add
+        #on delete, update all indexes ahead
+        if plid == "new":
+            plid = id_generator()
+
+        return self.checkReturn({"result" : "Shit happened"}, "addToPL")
 
 
     def removeFromPL(self, songid, orderi, plid):
