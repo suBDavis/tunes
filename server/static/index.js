@@ -31,6 +31,8 @@ function initialize(){
 
     uniplayer = new uniPlayer();
     uniplayer.init();
+
+    loadpl($("#initial_plid").text());
 }
 //-------------------------------------------
 // Song object that is ambuguous to source 
@@ -296,7 +298,7 @@ function results(tagid){
   this.ytdiv = $("#yt-results-table");
   this.reclist = [];
   this.recdiv = $("#rec-results-table");
-  this.maxchars = 60;
+  this.maxchars = 40;
   this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
   this.sr = {};
   
@@ -404,5 +406,11 @@ function results(tagid){
     this.ytdiv.show();
     this.div.show();
     this.recdiv.show();
+  }
+}
+
+function loadpl(plid){
+  if (plid.length > 0){
+    pl_manager.plid = plid;
   }
 }

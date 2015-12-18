@@ -106,11 +106,11 @@ class SQL:
     #this section manages playlist stuff
 
     def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
-        #return ''.join(random.choice(chars) for _ in range(size))
+        return ''.join(random.choice(chars) for _ in range(size))
         #put everything in the same playlist so I can purge it all later.
-        return "TEMPPL"
+        #return "TEMPPL"
         
-    def addToPL(self, songtype, resourceID, title, artist, plid):
+    def addToPL(self, songtype, resourceID, title, artist, plid, index):
         
         #we will pass it this for every insert.  
         #type:  sc - soundcloud
@@ -125,9 +125,10 @@ class SQL:
         #If the playlist isn't there, we will create it.  check that the playlist exists every single time.  This is easier than having the client manage this crap.
         
         #See if the song needs to be added to songs
-        findSong = "SELECT guid FROM sp_songs WHERE rid = (SELECT rid  FROM resource R WHERE resource_id = %s AND R.type = %s);"
+        findSong = "SELECT guid, artist, title, rid FROM sp_songs WHERE rid = (SELECT rid  FROM resource R WHERE resource_id = %s AND R.type = %s);"
         params = (resourceID, songtype)
         result = self.query(findSong, params)
+        print(result)
         
         if len(result) == 0:
             #add it to resource
@@ -137,24 +138,33 @@ class SQL:
 
             #insert in sp_songs
             insertSong = "INSERT INTO sp_songs (guid, artist, title, album, rid) VALUES (%s, %s, %s, %s, %s);"
-            params = (resourceID, artist, title, "na", self.connection.cursor().lastrowid)
+            params = (resourceID, artist, title, "na", self.lastRowID())
             result = self.query(insertSong, params)
             
         #Now put it in the playlist.
-        #logic for playlist location.
-        #get max index then add one on add
-        #on delete, update all indexes ahead
+        #logic for playlist location.  This will be done by the 
         if plid == "new":
-            plid = id_generator()
+            #we didn't find it.  make a new one
+            plid = self.id_generator()  #TODO - check that this hasnt been used before.
+            print(plid)
+            # findPlaylist = "SELECT plid FROM db_playlists WHERE plid = %s"
+            # params = (plid)
+            # result = self.query(findPlaylist, params)
 
-        return self.checkReturn({"result" : "Shit happened"}, "addToPL")
+        insPLID = "INSERT INTO db_relation (plid, songid, i) VALUES (%s, %s, %s);"
+        params = (plid, resourceID, index)
+        result = self.query(insPLID, params)
+        print(result)
+        return self.checkReturn({"plid" : plid}, "addToPL")
 
-
-    def removeFromPL(self, songid, orderi, plid):
-        print(orderi)
-        sql = "DELETE FROM relation WHERE plid=%s AND rid=%s AND orderi=%s"
-        params = (plid, songid, orderi)
+    def removeFromPL(self, songid, plid, index):
+        sql = "DELETE FROM db_relation WHERE plid=%s AND songid=%s AND i=%s"
+        params = (plid, songid, index)
         result = self.query(sql, params)
+        #shift the others in the database down one to compensate
+        sql = "UPDATE db_relation SET i = i-1 WHERE i > %s AND plid = %s"
+        params = (index, plid)
+        result2 = self.query(sql, params)
         #TODO: handle error when song not found
         #if a remove happens, then the song must already have been in the db.  
         #if the song was already in the db, we can referr to it by the db it (guid from sp_songs)
@@ -162,7 +172,7 @@ class SQL:
         return self.checkReturn(result, "pl_remove_result")
 
     def getPL(self, plid):
-        sql="SELECT * FROM relation WHERE plid=%s"
+        sql="SELECT artist, title, album, S.guid, R.resource_id, R.type, D.i FROM db_relation D, sp_songs S, resource R WHERE D.plid = %s AND D.songid = R.resource_id AND S.rid = R.rid GROUP BY R.rid ORDER BY i asc;"
         params=(plid)
         result = self.query(sql,params)
         return(self.checkReturn(result, "pl_result"))
@@ -179,6 +189,14 @@ class SQL:
                 return res 
         except:
             return self.error()
+    def lastRowID(self):
+        result = self.query("SELECT last_insert_id() as id", ())
+        return result[0]['id']
+    def getMaxIndexFromPLID(self, plid):
+        maxIndex = "SELECT MAX(i) as max FROM db_relation WHERE plid = %s"
+        params = (plid)
+        result = self.query(maxIndex, params)
+        return result[0]['max']
     #This creates a new error message
     def error(self):
         return { "error" : "internal"}

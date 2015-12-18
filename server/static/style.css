@@ -8,7 +8,13 @@
     background: #ff9980;
 }
 #search-container{
-    
+}
+#sidebar{
+    background: #c8e6c9;
+    height: 100%;
+    width:30%;
+    float: left;
+    max-width: 400px;
 }
 #search {
     border-style: solid;
@@ -17,6 +23,9 @@
     padding: 8px;
     margin:0px;
     box-sizing: border-box;
+    background: white;
+    padding-left: 8px;
+    padding-right: 8px;    
 }
 #search:focus{
     border-color: black;
@@ -31,8 +40,8 @@
     background-color: #e0e0d1;
 }
 #search-results td{
-    padding: 8px;
-    font-size: 14px;
+    padding: 6px;
+    font-size: 12px;
 }
 .scrt {
     background-color: #ffb366;
@@ -40,11 +49,14 @@
 .ytrt {
     background-color: #ff9980;
 }
+.recrt {
+    background-color: #ea80fc;
+}
 td.a {
-    width:25%;
+    width:35%;
 }
 td.b {
-    width: 70%;
+    width: 60%;
 }
 td.c {
     width:5%;
@@ -52,10 +64,66 @@ td.c {
 .b-small {
     width:25px;
     height:25px;
-    line-height: 25px;
+    line-height: 22px;
 }
 .b-small i{
-    line-height: 25px;
+    line-height: 22px;
 }
 h1 {
+}
+body {
+    padding: 0px;
+    margin: 0px;
+}
+.row {
+    margin-bottom: 0px;
+}
+.container-fluid{
+    padding: 0px;
+}
+#main-container {
+    height:100%;
+    width: 70%;
+    float:left;
+    position: relative;
+}
+.player-wrapper{
+    position: absolute;
+    bottom:0;
+    right:0;
+    left: 0;
+}
+.player-box{
+    height: 200px;
+    position: relative;
+    padding: 0px;
+    display: block;
+    width: auto;
+}
+#player{
+    float: left;
+    width: 320px;
+}
+#scplayer-wrapper{
+    float: left;
+    overflow: hidden;
+    display: block;
+}
+#pl-header-wrapper{
+    height: 7%;
+}
+#pl-header{
+    float: left;
+    height:100%;
+}
+#pl-controls{
+    float: left;
+    height: 100%;
+}
+#playlist{
+    clear: both;
+}
+.ctrl-btn{
+    margin-top: 32px;
+    margin-left: 20px;
 }

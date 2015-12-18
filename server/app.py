@@ -77,8 +77,9 @@ def addToPL(plid):
     song_title = request.form['title']
     song_artist = request.form['artist']
     resource_id = request.form['song_id']
+    index = request.form['index']
     playlist_id = plid
-    return jsonify(sql.addToPL(song_type, resource_id, song_title, song_artist, playlist_id))
+    return jsonify(sql.addToPL(song_type, resource_id, song_title, song_artist, playlist_id, index))
 
 @app.route("/api/playlist/<plid>/song", methods=["DELETE"])
 def removeFromPL(plid):
@@ -86,11 +87,11 @@ def removeFromPL(plid):
     #because the track must already be in the DB, we only need songid and plid
     song_id = request.form['song_id']
     #print(song_id)
-    order = request.form['orderi']
+    order = request.form['index']
     #print(order)
     playlist_id = plid  
     #print(plid)
-    return jsonify(sql.removeFromPL(song_id, order, playlist_id))
+    return jsonify(sql.removeFromPL(song_id, playlist_id, order))
 
 @app.route("/api/playlist/<plid>", methods=['GET'])
 def getPL(plid):

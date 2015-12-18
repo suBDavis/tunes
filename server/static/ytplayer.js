@@ -10,8 +10,9 @@ var ytplayer;
 
 function onYouTubeIframeAPIReady() {
   ytplayer = new YT.Player('player', {
-    height: '390',
-    width: '640',
+    height: '200',
+    width: '38%',
+    playerVars:{'controls' : 0},
     videoId: null, //should return null every time, so this will fail and we will have an empty player waiting for someone to call ytLoadSong()
     events: {
       'onReady': onPlayerReady,
@@ -24,6 +25,7 @@ function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
   //tell the universal player that the youtube player is ready.
   uniplayer.alertYoutubeReady();
+  pl_manager.load();
 }
 // 5. The API calls this function when the player's state changes.
 //    The function indicates that when playing a video (state=1),
@@ -128,7 +130,7 @@ function uniPlayer(){
   //soundcloud functions
   this.scLoadSong = function(id){
     url = "http://api.soundcloud.com/tracks/" + id
-    options = {"show_artwork" : false, "auto_play" : true };
+    options = {"show_artwork" : true, "auto_play" : true };
     this.soundcloud.load(url, options);
   }
 
