@@ -299,7 +299,7 @@ function results(tagid){
   this.reclist = [];
   this.recdiv = $("#rec-results-table");
   this.maxchars = 40;
-  this.bnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small'><i class='material-icons'>+</i></a>";
+  this.bnode = "<a class='b-small'><i class='fa fa-plus-circle fa-2x'></i></a>";
   this.sr = {};
   
   this.addItem = function(dict_item, type){

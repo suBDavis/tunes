@@ -110,9 +110,9 @@ var playlist = function(){
 var pl_display = function(){
     this.pldiv = $("#playlist");
     //this.rmnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small remove'>X</a>";
-    this.rmnode = "<a href='javascript:;' class='remove'><b>X</b></a>"
+    this.rmnode = "<a href='javascript:;' class='remove'><i class='fa fa-minus-circle fa-2x'></i></a>"
     //this.playnode = "<a class='btn-floating waves-effect waves-light blue-grey darken-1 b-small play'><i class='material-icons'>play_arrow</i></a>";
-    this.playnode = "<a href='javascript:;' class='play'><i class='material-icons'>play_arrow</i></a>"
+    this.playnode = "<a href='javascript:;' class='play'><i class='fa fa-play-circle fa-2x'></i></a>"
     this.update = function(){
         this.pldiv.empty();
 
