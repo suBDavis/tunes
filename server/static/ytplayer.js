@@ -1,9 +1,10 @@
 // 2. This code loads the IFrame Player API code asynchronously.
-var tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
+function loadYT(){
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
 // 3. This function creates an <iframe> (and YouTube player)
 //    after the API code downloads.
 var ytplayer;
@@ -24,7 +25,7 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
   //When the player is ready, we don't really want to do anything unless the user has addes something to the playlist queue yet.
   //tell the universal player that the youtube player is ready.
-  uniplayer.alertYoutubeReady();
+  uniplayer.alertPlayerReady();
   pl_manager.load();
 }
 // 5. The API calls this function when the player's state changes.
@@ -59,7 +60,8 @@ function initializeSCPlayer(){
 // ====================================
 var uniplayer;
 
-function uniPlayer(){
+function uniPlayer(usingLocal){
+
   this.currentSong = null;
   this.youtube = null;
   this.soundcloud = null;
@@ -67,71 +69,111 @@ function uniPlayer(){
   //youtube specific variables
   this.youtubeReady = false;
   this.soundcloudReady = false;
+  this.ready = false;
 
-  this.init = function(){
-    this.soundcloud = initializeSCPlayer();
-    this.soundcloudReady = true;
-    this.soundcloud.bind(SC.Widget.Events.FINISH, this.songEnded);
-  }
-  
-  this.play = function(){
-    if (this.currentSong.songtype == 'youtube'){
-      this.youtube.playVideo();
-    } else {
-      this.soundcloud.play();
+  //if we are using the client-side player
+  if (usingLocal){
+    this.init = function(){
+      loadYT();
+      this.soundcloud = initializeSCPlayer();
+      this.soundcloudReady = true;
+      this.soundcloud.bind(SC.Widget.Events.FINISH, this.songEnded);
     }
-  }
-
-  this.loadSong = function(){
-    if (this.youtubeReady && this.soundcloudReady){
-      //play whatever's in the queue
+    
+    this.play = function(){
       if (this.currentSong.songtype == 'youtube'){
-        //youtube song 
-        ytLoadSong(this.currentSong.resourceid);
+        this.youtube.playVideo();
       } else {
-        this.scLoadSong(this.currentSong.resourceid);
+        this.soundcloud.play();
       }
     }
-  }
 
-  this.pause = function(){
-    if (this.currentSong.songtype == 'youtube'){
-      this.youtube.pauseVideo();
-    } else {
-      this.soundcloud.pause();
+    this.loadSong = function(){
+      if (this.youtubeReady && this.soundcloudReady){
+        //play whatever's in the queue
+        if (this.currentSong.songtype == 'youtube'){
+          //youtube song 
+          ytLoadSong(this.currentSong.resourceid);
+        } else {
+          this.scLoadSong(this.currentSong.resourceid);
+        }
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    this.pause = function(){
+      if (this.currentSong.songtype == 'youtube'){
+        this.youtube.pauseVideo();
+      } else {
+        this.soundcloud.pause();
+      }
+    }
+
+    this.songEnded = function(){
+      uniplayer.currentSong = pl_manager.getNext();
+      uniplayer.loadSong();
+    }
+
+    this.skip = function(){
+      this.pause();
+      this.currentSong = pl_manager.getNext();
+      this.loadSong();
+    }
+    this.back = function(){
+      this.pause();
+      this.currentSong = pl_manager.getPrevious();
+      this.loadSong();
+    }
+    this.setCurrentSong=function(song){
+      this.currentSong = song;
+    }
+
+    //youtube functions
+    this.alertPlayerReady = function(){
+      this.youtubeReady = true;
+      this.youtube = ytplayer;
+    }
+    //soundcloud functions
+    this.scLoadSong = function(id){
+      url = "http://api.soundcloud.com/tracks/" + id
+      options = {"show_artwork" : true, "auto_play" : true };
+      this.soundcloud.load(url, options);
     }
   }
-
-  this.songEnded = function(){
-    uniplayer.currentSong = pl_manager.getNext();
-    uniplayer.loadSong();
-  }
-
-  this.skip = function(){
-    this.pause();
-    this.currentSong = pl_manager.getNext();
-    this.loadSong();
-  }
-  this.back = function(){
-    this.pause();
-    this.currentSong = pl_manager.getPrevious();
-    this.loadSong();
-  }
-  this.setCurrentSong=function(song){
-    this.currentSong = song;
-  }
-
-  //youtube functions
-  this.alertYoutubeReady = function(){
-    this.youtubeReady = true;
-    this.youtube = ytplayer;
-  }
-
-  //soundcloud functions
-  this.scLoadSong = function(id){
-    url = "http://api.soundcloud.com/tracks/" + id
-    options = {"show_artwork" : true, "auto_play" : true };
-    this.soundcloud.load(url, options);
+  //otherwise, we aint
+  else {
+    this.init = function(){
+      
+    }
+    this.play = function(){
+      
+    }
+    this.loadSong = function(){
+      return true;
+    }
+    this.pause = function(){
+      
+    }
+    this.songEnded = function(){
+      //this will never be called.  Server will handle this.
+    }
+    this.skip = function(){
+      //the server will say what's playing.
+      //using local playlist for now because server isnt working.
+      this.currentSong = pl_manager.getNext();
+    }
+    this.back = function(){
+      this.currentSong = pl_manager.getPrevious();
+    }
+    this.setCurrentSong=function(song){
+      this.currentSong = song;
+    }
+    //probably wont be used.
+    this.alertPlayerReady = function(){
+      this.ready= true;
+    }
   }
 
 }

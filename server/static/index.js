@@ -1,5 +1,5 @@
 "use strict"
-
+var usingLocal = true; //change this to load/not load the local player.otherwise uniplayer will AJAX the server instead of the local shit.
 // Developing Locally?  Swap the comments here and start the python server.
 // var baseurl = "http://tunes.redspin.net"
 var baseurl = "http://localhost:5000"
@@ -23,13 +23,11 @@ function initialize(){
     //register listener for search box.
     $("#search").on('input', function(){ updateSearch(); });
     $("#search-ajax").on('click', function(e){ generateResults(e); });
-   
-    //Let's create a soundcloud API connection
-    SC.initialize({
-      client_id : "463bb2a042fa56ed7e95c35b7bf4d615"
-    });
+    
+    //soundcloud query API 
+    SC.initialize({client_id : "463bb2a042fa56ed7e95c35b7bf4d615"});
 
-    uniplayer = new uniPlayer();
+    uniplayer = new uniPlayer(usingLocal);
     uniplayer.init();
 
     loadpl($("#initial_plid").text());
@@ -299,7 +297,7 @@ function results(tagid){
   this.reclist = [];
   this.recdiv = $("#rec-results-table");
   this.maxchars = 40;
-  this.bnode = "<a class='b-small'><i class='fa fa-plus-circle fa-2x'></i></a>";
+  this.bnode = "<a href='javascript:;' aclass='b-small'><i class='fa fa-plus-circle fa-2x'></i></a>";
   this.sr = {};
   
   this.addItem = function(dict_item, type){

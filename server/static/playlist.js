@@ -3,11 +3,16 @@ var playlist = function(){
     this.pointer = 0;
     this.disp = new pl_display();
     this.plid = "new";
+    this.loadreturned = false;
 
     this.getNext = function(){
         //return the next song and increment the playlist pointer
-        this.pointer+=1;
-        return this.plist[this.pointer];
+        if (this.pointer < this.plist.length-1){
+            this.pointer+=1;
+            return this.plist[this.pointer];
+        } else {
+            return this.plist[this.pointer];
+        }
     }
     this.remove = function(songid){
         var copy = this.plist;
@@ -48,14 +53,21 @@ var playlist = function(){
             console.log(text);
             var json_res = JSON.parse(text);
             pl_manager.plid = json_res['plid'];
+            pl_manager.disp.setPLID(json_res['plid']);
         });
 
         if(this.plist.length == 1){
+
             //we added the first song.  Let the playing begin!
             //Tell the player that we have a song, and let the player decide when to play it if it's ready
             uniplayer.setCurrentSong(song)
 
-            uniplayer.loadSong();
+            var canLoad = uniplayer.loadSong();
+            
+            var tryAgain = function(){
+                return uniplayer.loadSong();
+            }
+
             uniplayer.play();
         }
         
@@ -91,9 +103,10 @@ var playlist = function(){
         }
     }
     this.load = function(){
-        console.log(this.plid);
+        //console.log(this.plid);
         if(this.plid != "new"){
             ajax("/api/playlist/" + this.plid , function(text){
+                pl_manager.loadreturned = true;
                 var reply = JSON.parse(text);
                 var songarr = reply['pl_result'];
                 for(var i =0;i<songarr.length;i++){
@@ -103,6 +116,17 @@ var playlist = function(){
                 }
 
             });
+            this.loading("");
+        }
+    }
+    this.loading = function(c){
+        if (c.length==6){
+            c = ".";
+        }
+        if (this.loadreturned == false){
+
+            this.disp.setPLID("loading" + c)
+            setTimeout(function(){pl_manager.loading( c + "." ); }, 500);
         }
     }
 }
@@ -135,5 +159,8 @@ var pl_display = function(){
             sid = sid.substring(2, sid.length);
             pl_manager.play(sid);
         });
+    }
+    this.setPLID = function(plid){
+        $("#plid-tag").html(plid);
     }
 }

@@ -17,7 +17,7 @@
     overflow-y: auto;
     padding-left: 8px;
     padding-right: 8px;
-    flex-basis:350px;
+    flex-basis:420px;
     order:1;
 }
 #search {
@@ -46,6 +46,11 @@
 #search-results td{
     padding: 6px;
     font-size: 12px;
+    white-space: nowrap;
+    overflow:hidden;
+}
+#search-results table{
+    table-layout:fixed;
 }
 .scrt {
     background-color: #ffb366;
@@ -57,13 +62,13 @@
     background-color: #ea80fc;
 }
 td.a {
-    width:35%;
+    width:30%;
 }
 td.b {
     width: 60%;
 }
 td.c {
-    width:5%;
+    width:10%;
 }
 .b-small {
     width:25px;
@@ -92,8 +97,9 @@ body {
     position: relative;
 }
 #playlist{
-    width: 70%;
+    width: ;
     margin-left: 15px;
+    min-width: 
 }
 #playlist tr{
     height: 30px;
@@ -140,6 +146,8 @@ body {
 }
 #controls{
     float: right;
+    padding-top: 10px;
+    padding-right: 20px;
 }
 .ctrl-btn{
     margin-top: 20%
@@ -149,7 +157,7 @@ body {
     color: black; 
 }
 .fa:hover{
-    color:#ea80fc;
+    color:black;
 }
 
 #fullheight {
